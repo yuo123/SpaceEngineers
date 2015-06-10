@@ -794,12 +794,24 @@ namespace Sandbox.Game.Entities
 
         #region Entity events
 
-        /// <summary>
         /// Called when [activated] which for entity means that was added to scene.
         /// </summary>
         /// <param name="source">The source of activation.</param>
         public virtual void OnAddedToScene(object source)
         {
+
+            OnAddedToScene(source, null);
+        }
+
+        /// <summary>
+        /// Called when [activated] which for entity means that was added to scene.
+        /// </summary>
+        /// <param name="source">The source of activation.</param>
+        /// <param name="world">The HkWorld to insert the entity into</param>
+        public virtual void OnAddedToScene(object source, HkWorld world)
+        {
+
+
             System.Diagnostics.Debug.Assert(InScene == false, "Object was inserted twice into the scene");
             System.Diagnostics.Debug.Assert((EntityId != 0 && Save) || !Save);
 
@@ -820,7 +832,13 @@ namespace Sandbox.Game.Entities
             if (this.m_physics != null)
             {
                 VRageRender.MyRenderProxy.GetRenderProfiler().StartProfilingBlock("m_physics.Activate");
-                this.m_physics.Activate();
+
+                if (world != null)
+                    this.m_physics.Activate(world, 0);
+                else
+                    this.m_physics.Activate();
+
+
                 VRageRender.MyRenderProxy.GetRenderProfiler().EndProfilingBlock();
             }
 
@@ -831,7 +849,14 @@ namespace Sandbox.Game.Entities
 
             foreach (var child in Hierarchy.Children)
             {
+                child.Entity.OnAddedToScene(source);
+
+            }
+            foreach (var child in Hierarchy.Children)
+            {
+                if (!child.Container.Entity.InScene)
                 child.Container.Entity.OnAddedToScene(source);
+
             }
 
             if (MyFakes.ENABLE_ASTEROID_FIELDS)
@@ -841,6 +866,7 @@ namespace Sandbox.Game.Entities
 
             VRageRender.MyRenderProxy.GetRenderProfiler().EndProfilingBlock();
         }
+        
 
 
         public virtual void OnRemovedFromScene(object source)

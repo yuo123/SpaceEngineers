@@ -1195,6 +1195,10 @@ namespace Sandbox.Game.World
 
             MyLog.Default.WriteLineAndConsole("Session loaded");
             ProfilerShort.End();
+
+            //========BUBBLE DEBUG CODE =======
+            Bubbles.Bubble.CreateDebugBubble();
+            //=================================
         }
 
         internal static void CreateWithEmptyWorld(MyMultiplayerBase multiplayerSession)

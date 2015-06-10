@@ -1185,7 +1185,14 @@ namespace Sandbox.Game.Entities
 
         public override void OnAddedToScene(object source)
         {
-            base.OnAddedToScene(source);
+
+            OnAddedToScene(source, null);
+        }
+
+        public override void OnAddedToScene(object source, HkWorld world)
+        {
+            base.OnAddedToScene(source, world);
+
             MyCubeGridGroups.Static.AddNode(GridLinkTypeEnum.Logical, this);
             MyCubeGridGroups.Static.AddNode(GridLinkTypeEnum.Physical, this);
         }

@@ -24,6 +24,7 @@ using Sandbox.Common.ObjectBuilders.Definitions;
 using System;
 using Sandbox.Game.Multiplayer;
 
+using Sandbox.Game.Bubbles;
 
 #endregion
 
@@ -86,6 +87,11 @@ namespace Sandbox.Engine.Physics
         public static int ThreadId;
 
         public static MyHavokCluster Clusters;
+
+        /// <summary>
+        /// The list of bubbles currently ijn the world
+        /// </summary>
+        public static List<Bubble> Bubbles;
 
         private static HkJobThreadPool m_threadPool;
         private static HkJobQueue m_jobQueue;
@@ -276,6 +282,9 @@ namespace Sandbox.Engine.Physics
 
             ThreadId = Thread.CurrentThread.ManagedThreadId;
 
+            //create the bubbles list
+            Bubbles = new List<Bubble>();
+
             if(MyPerGameSettings.SingleCluster)
                 Clusters = new MyHavokCluster(MySession.Static.WorldBoundaries);
             else
@@ -442,6 +451,24 @@ namespace Sandbox.Engine.Physics
                 world.MarkForWrite();
             }
 
+                        foreach (HkWorld world in Clusters.GetList())
+            {
+
+                world.UnmarkForWrite();
+                world.StepSimulation(MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * MyFakes.SIMULATION_SPEED);
+                world.MarkForWrite();
+            }
+            
+            //step all bubble physics
+            foreach (Bubble bubble in Bubbles)
+            {
+                HkWorld world = bubble.InternalWorld;
+
+                world.UnmarkForWrite();
+                world.StepSimulation(MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * MyFakes.SIMULATION_SPEED);
+                world.MarkForWrite();
+            }
+
             ProfilerShort.End();
             InsideSimulation = false;
 
@@ -450,6 +477,12 @@ namespace Sandbox.Engine.Physics
             long activeRigidBodies = 0;
             foreach (HkWorld world in Clusters.GetList())
             {
+                activeRigidBodies += world.ActiveRigidBodies.Count;
+            }
+
+            foreach (Bubble bubble in Bubbles)
+            {
+                HkWorld world = bubble.InternalWorld;
                 activeRigidBodies += world.ActiveRigidBodies.Count;
             }
 
@@ -462,6 +495,11 @@ namespace Sandbox.Engine.Physics
                 IterateBodies(world);
             }
 
+            //add bubbles' rigid bodies to iteration bodies
+            foreach (Bubble bubble in Bubbles)
+            {
+                IterateBodies(bubble.InternalWorld);
+            }
 
             //ParallelTasks.Parallel.For(0, m_iterationBodies.Count, (rb) =>
             //{
@@ -497,6 +535,12 @@ namespace Sandbox.Engine.Physics
             foreach (HkWorld world in Clusters.GetList())
             {
                 world.StepVDB(MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS);
+            }
+
+            //step vdb for bubbles
+            foreach (Bubble bubble in Bubbles)
+            {
+                bubble.InternalWorld.StepVDB(MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS);
             }
 
             ProfilerShort.End();
