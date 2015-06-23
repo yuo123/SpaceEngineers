@@ -48,6 +48,9 @@ namespace Sandbox.Engine.Physics
     /// </summary>
     public class MyPhysicsBody : MyPhysicsComponentBase, MyClusterTree.IMyActivationHandler
     {
+        public bool InBubble { get; set; }
+
+
         public static bool HkGridShapeCellDebugDraw = false;
 
         private Vector3 m_lastLinearVelocity;
@@ -1728,9 +1731,12 @@ false,
                 ProfilerShort.End();
             }
 
-            ProfilerShort.Begin("UpdateCluster");
-            UpdateCluster();
-            ProfilerShort.End();
+            if (!InBubble)
+            {
+                ProfilerShort.Begin("UpdateCluster");
+                UpdateCluster();
+                ProfilerShort.End();
+            }
 
             ProfilerShort.End();
         }
@@ -1747,7 +1753,10 @@ false,
             Vector3 transformedCenter;
             MatrixD entityMatrix = MatrixD.Identity;
             Matrix rbWorld;
-            var offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
+
+            Vector3D offset = Vector3D.Zero;
+            if (!InBubble)
+                offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
 
             if (RigidBody2 != null)
             {
@@ -1848,7 +1857,8 @@ false,
             {
                 velocity = parentEntity.Physics.LinearVelocity;
             }
-            MyPhysics.Clusters.MoveObject(ClusterObjectID, Entity.WorldAABB, Entity.WorldAABB, velocity);
+            if (!InBubble)
+                MyPhysics.Clusters.MoveObject(ClusterObjectID, Entity.WorldAABB, Entity.WorldAABB, velocity);
 
             //if (m_motionState != null)
             //{
@@ -1897,7 +1907,9 @@ false,
 
             Vector3 transformedCenter = Vector3.TransformNormal(Center, Entity.WorldMatrix);
 
-            var offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
+            var offset = Vector3D.Zero;
+            if (!InBubble)
+                offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
 
             Matrix rigidBodyMatrix = Matrix.CreateWorld((Vector3)((Vector3D)transformedCenter + Entity.GetPosition() - (Vector3D)offset), Entity.WorldMatrix.Forward, Entity.WorldMatrix.Up);
             return rigidBodyMatrix;

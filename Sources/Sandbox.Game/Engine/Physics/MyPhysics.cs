@@ -89,7 +89,7 @@ namespace Sandbox.Engine.Physics
         public static MyHavokCluster Clusters;
 
         /// <summary>
-        /// The list of bubbles currently ijn the world
+        /// The list of bubbles currently in the world
         /// </summary>
         public static List<Bubble> Bubbles;
 
@@ -432,7 +432,6 @@ namespace Sandbox.Engine.Physics
             if (MyFakes.PAUSE_PHYSICS && !MyFakes.STEP_PHYSICS)
                 return;
             MyFakes.STEP_PHYSICS = false;
-
             if (!MySandboxGame.IsGameReady)
                 return;
 
@@ -440,20 +439,11 @@ namespace Sandbox.Engine.Physics
 
             InsideSimulation = true;
             ProcessDestructions();
-
             ProfilerShort.Begin("HavokWorld.Step");
 
             foreach (HkWorld world in Clusters.GetList())
             {
                 //VRageRender.MyRenderProxy.DebugDrawText2D(new Vector2(100, 100), "Constr:" + world.GetConstraintCount(), Color.Red, 0.9f);
-                world.UnmarkForWrite();
-                world.StepSimulation(MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * MyFakes.SIMULATION_SPEED);
-                world.MarkForWrite();
-            }
-
-                        foreach (HkWorld world in Clusters.GetList())
-            {
-
                 world.UnmarkForWrite();
                 world.StepSimulation(MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * MyFakes.SIMULATION_SPEED);
                 world.MarkForWrite();
@@ -520,7 +510,7 @@ namespace Sandbox.Engine.Physics
             foreach (HkCharacterRigidBody rb in m_characterIterationBodies)
             {
                 var body = (MyPhysicsBody)rb.GetHitRigidBody().UserObject;
-                if (body.Entity.WorldMatrix.Translation != body.GetWorldMatrix().Translation)
+                if (!body.InBubble && body.Entity.WorldMatrix.Translation != body.GetWorldMatrix().Translation)
                 {
                     body.UpdateCluster();
                 }
@@ -544,6 +534,8 @@ namespace Sandbox.Engine.Physics
             }
 
             ProfilerShort.End();
+
+
         }
 
 

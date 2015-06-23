@@ -347,6 +347,7 @@
     <Compile Include="Game\AI\Pathfinding\MyNavmeshComponents.cs" />
     <Compile Include="Game\Audio\MyAudioExtensions.cs" />
     <Compile Include="Game\Bubbles\Bubble.cs" />
+    <Compile Include="Game\Bubbles\BubblePhysicsBody.cs" />
     <Compile Include="Game\Components\DebugRenders\MyDebugRenderCompomentDrawDrillBase.cs" />
     <Compile Include="Game\Components\DebugRenders\MyDebugRenderComponentCharacter.cs" />
     <Compile Include="Game\Components\DebugRenders\MyDebugRenderComponentCubeGrid.cs" />

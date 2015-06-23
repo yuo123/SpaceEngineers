@@ -9,12 +9,11 @@ using VRageMath;
 
 namespace VRage.Components
 {
+    /// <summary>
+    /// Internal world matrix of entity.
+    /// </summary>
     public abstract class MyPositionComponentBase : MyEntityComponentBase
     {
-        /// <summary>
-        /// Internal world matrix of entity.
-        /// </summary>
-        
         static private BoundingBoxD m_invalidBox = BoundingBoxD.CreateInvalid();
         protected MatrixD m_worldMatrix = MatrixD.Identity;
         protected MatrixD m_previousParentWorldMatrix = MatrixD.Identity;
@@ -224,7 +223,7 @@ namespace VRage.Components
                 m_localMatrixChanged = true;
                 this.m_localMatrix = localMatrix;
                 UpdateWorldMatrix(source);
-            }       
+            }
         }
 
         /// <summary>

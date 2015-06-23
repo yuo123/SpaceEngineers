@@ -18,16 +18,8 @@ namespace Sandbox.Game.Bubbles
     {
         /*
         To-do list:
-         add a HkWorld as a member of Bubble
-         add a bubbles list to MyPhysics, to be updated every frame: 
-          first in MyPhysics (like the Clusters list),
-          then in UpdateAfterFrame, in Bubble, handling bubble "transitions"
-         
-         current target milestone: 
-          having two physics objects in a bubble, thet interact with each other and 
-          render correctly, but do not interact with anything else.
-         
-          - done? hard to tell, since I currently hav no way of interacting with objects inside bubbles.
+         Add methods to add and remove objects from bubble
+         Implement bubble "transitions" inside UpdateAfterSimulation
         */
 
         #region fields
@@ -69,8 +61,14 @@ namespace Sandbox.Game.Bubbles
 
             //grid2.PositionComp.SetPosition(new VRageMath.Vector3D(0, 1, 0));
 
+            grid.Physics.InBubble = true;
             grid.OnAddedToScene(null, re.m_internWorld);
             //grid2.OnAddedToScene(null, re.m_internWorld);
+
+            //add character to debug bubble
+            MyEntities.Remove(MySession.LocalCharacter);
+            MySession.LocalCharacter.Physics.InBubble = true;
+            MySession.LocalCharacter.OnAddedToScene(MySession.LocalCharacter, re.m_internWorld);
 
             MyPhysics.Bubbles.Add(re);
         }
@@ -81,5 +79,14 @@ namespace Sandbox.Game.Bubbles
             if (this.PositionComp.GetPosition() != VRageMath.Vector3D.Zero)
                 System.Windows.Forms.MessageBox.Show("Bubble moved");
         }
+
+        //public void AddEntityToBubble(MyEntity entity)
+        //{
+        //    BubblePhysicsBody nphysics = new BubblePhysicsBody();
+        //    BubblePhysicsBody.CopyFromBase(nphysics, entity.Physics);
+        //    entity.Physics = nphysics;
+
+        //    //MTODO: add location and velocity conversions
+        //}
     }
 }
