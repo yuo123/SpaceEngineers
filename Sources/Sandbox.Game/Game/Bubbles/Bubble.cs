@@ -17,7 +17,7 @@ namespace Sandbox.Game.Bubbles
     public class Bubble : MyEntity
     {
         /*
-        To-do list:
+        //MTODO: To-do list:
          Add methods to add and remove objects from bubble
          Implement bubble "transitions" inside UpdateAfterSimulation
         */
@@ -61,32 +61,29 @@ namespace Sandbox.Game.Bubbles
 
             //grid2.PositionComp.SetPosition(new VRageMath.Vector3D(0, 1, 0));
 
-            grid.Physics.InBubble = true;
-            grid.OnAddedToScene(null, re.m_internWorld);
+            re.AddEntityToBubble(grid);
             //grid2.OnAddedToScene(null, re.m_internWorld);
 
             //add character to debug bubble
             MyEntities.Remove(MySession.LocalCharacter);
-            MySession.LocalCharacter.Physics.InBubble = true;
-            MySession.LocalCharacter.OnAddedToScene(MySession.LocalCharacter, re.m_internWorld);
+            re.AddEntityToBubble(MySession.LocalCharacter);
 
             MyPhysics.Bubbles.Add(re);
         }
 
         public override void UpdateAfterSimulation()
         {
-            base.UpdateAfterSimulation();
             if (this.PositionComp.GetPosition() != VRageMath.Vector3D.Zero)
                 System.Windows.Forms.MessageBox.Show("Bubble moved");
         }
 
-        //public void AddEntityToBubble(MyEntity entity)
-        //{
-        //    BubblePhysicsBody nphysics = new BubblePhysicsBody();
-        //    BubblePhysicsBody.CopyFromBase(nphysics, entity.Physics);
-        //    entity.Physics = nphysics;
+        public void AddEntityToBubble(MyEntity entity)
+        {
+            entity.Physics.Bubble = this;
+            entity.Physics.InBubble = true;
+            entity.OnAddedToScene(null, m_internWorld);
 
-        //    //MTODO: add location and velocity conversions
-        //}
+            //MTODO: add location and velocity conversions
+        }
     }
 }

@@ -26,6 +26,7 @@ using VRage;
 using Sandbox.Common.Components;
 using VRageMath.Spatial;
 using Sandbox.Game;
+using Sandbox.Game.Bubbles;
 
 #endregion
 
@@ -49,7 +50,10 @@ namespace Sandbox.Engine.Physics
     public class MyPhysicsBody : MyPhysicsComponentBase, MyClusterTree.IMyActivationHandler
     {
         public bool InBubble { get; set; }
-
+        /// <summary>
+        /// The physics bubble this physics body is in. Null if not using bubbles.
+        /// </summary>
+        public Bubble Bubble { get; set; }
 
         public static bool HkGridShapeCellDebugDraw = false;
 
@@ -1755,7 +1759,9 @@ false,
             Matrix rbWorld;
 
             Vector3D offset = Vector3D.Zero;
-            if (!InBubble)
+            if (InBubble)
+                offset = Bubble.PositionComp.GetPosition();
+            else
                 offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
 
             if (RigidBody2 != null)
@@ -1908,7 +1914,9 @@ false,
             Vector3 transformedCenter = Vector3.TransformNormal(Center, Entity.WorldMatrix);
 
             var offset = Vector3D.Zero;
-            if (!InBubble)
+            if (InBubble)
+                offset = Bubble.PositionComp.GetPosition();
+            else
                 offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
 
             Matrix rigidBodyMatrix = Matrix.CreateWorld((Vector3)((Vector3D)transformedCenter + Entity.GetPosition() - (Vector3D)offset), Entity.WorldMatrix.Forward, Entity.WorldMatrix.Up);
@@ -1921,7 +1929,11 @@ false,
 
             Vector3 transformedCenter = Vector3.TransformNormal(Center, worldMatrix);
 
-            var offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
+            var offset = Vector3D.Zero;
+            if (InBubble)
+                offset = Bubble.PositionComp.GetPosition();
+            else
+                offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
 
             Matrix rigidBodyMatrix = Matrix.CreateWorld((Vector3)((Vector3D)transformedCenter + worldMatrix.Translation - (Vector3D)offset), worldMatrix.Forward, worldMatrix.Up);
             return rigidBodyMatrix;

@@ -12,7 +12,7 @@ namespace Sandbox.Game.Bubbles
         public BubblePhysicsBody(VRage.ModAPI.IMyEntity entity, VRage.Components.RigidBodyFlag flags)
             : base(entity, flags)
         {
-
+            
         }
 
         public static void CopyFromBase(BubblePhysicsBody bphys, MyPhysicsBody ophys)
