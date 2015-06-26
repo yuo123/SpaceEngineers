@@ -1,0 +1,348 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2C96F0AB-7962-4B73-A075-B0E0B09F6195}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sandbox.Common</RootNamespace>
+    <AssemblyName>Sandbox.Common</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\x86\Release\Sandbox.Common.XML</DocumentationFile>
+    <NoWarn>1591,1572,1571,1573,1587,1570</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release Official|x86'">
+    <OutputPath>bin\x86\Release Official\</OutputPath>
+    <DefineConstants>OFFICIAL_BUILD</DefineConstants>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\x86\Release Official\Sandbox.Common.XML</DocumentationFile>
+    <NoWarn>1591,1572,1571,1573,1587,1570</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\x64\Release\Sandbox.Common.XML</DocumentationFile>
+    <NoWarn>1591,1572,1571,1573,1587,1570</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release Official|x64'">
+    <OutputPath>bin\x64\Release Official\</OutputPath>
+    <DefineConstants>OFFICIAL_BUILD</DefineConstants>
+    <Optimize>true</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\x64\Release Official\Sandbox.Common.XML</DocumentationFile>
+    <NoWarn>1591,1572,1571,1573,1587,1570</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AI\IMyAiTarget.cs" />
+    <Compile Include="AI\MyAgentBotActionProxy.cs" />
+    <Compile Include="AI\MyAnimalBotActionProxy.cs" />
+    <Compile Include="AI\MyBarbarianBotActionProxy.cs" />
+    <Compile Include="AI\MyAbstractBotActionProxy.cs" />
+    <Compile Include="AI\MyBehaviorTreeActionAttribute.cs" />
+    <Compile Include="AI\MyHumanoidBotActionProxy.cs" />
+    <Compile Include="AI\MyPeasantBotActionProxy.cs" />
+    <Compile Include="Components\IMyNamedComponent.cs" />
+    <Compile Include="Components\IMyUserInputComponent.cs" />
+    <Compile Include="Components\MyGameLogicComponent.cs" />
+    <Compile Include="Components\MyIngameScript.cs" />
+    <Compile Include="Components\MySessionComponentBase.cs" />
+    <Compile Include="Components\MySessionComponentMapping.cs" />
+    <Compile Include="ModAPI\IMyCamera.cs" />
+    <Compile Include="ModAPI\IMyConfig.cs" />
+    <Compile Include="ModAPI\IMyGps.cs" />
+    <Compile Include="ModAPI\IMyGpsCollection.cs" />
+    <Compile Include="ModAPI\IMyGridProgram.cs" />
+    <Compile Include="ModAPI\IMyGyro.cs" />
+    <Compile Include="ModAPI\IMyLaserAntenna.cs" />
+    <Compile Include="ModAPI\IMyMeteor.cs" />
+    <Compile Include="InputRecording\MyInputRecording.cs" />
+    <Compile Include="InputRecording\MyInputSnapshot.cs" />
+    <Compile Include="InputRecording\MyJoystickStateSnapshot.cs" />
+    <Compile Include="InputRecording\MyMouseSnapshot.cs" />
+    <Compile Include="ModAPI\IMyCharacter.cs" />
+    <Compile Include="ModAPI\IMyConfigDedicated.cs" />
+    <Compile Include="ModAPI\IMyDoor.cs" />
+    <Compile Include="ModAPI\IMyEntityController.cs" />
+    <Compile Include="ModAPI\IMyControllerInfo.cs" />
+    <Compile Include="ModAPI\IMyCubeBlock.cs" />
+    <Compile Include="ModAPI\IMyCubeBuilder.cs" />
+    <Compile Include="ModAPI\IMyCubeGrid.cs" />
+    <Compile Include="ModAPI\IMyEntities.cs" />
+    <Compile Include="ModAPI\IMyFaction.cs" />
+    <Compile Include="ModAPI\IMyFactionCollection.cs" />
+    <Compile Include="ModAPI\IMyFloatingObject.cs" />
+    <Compile Include="ModAPI\IMyFunctionalBlock.cs" />
+    <Compile Include="ModAPI\IMyHudObjectiveLine.cs" />
+    <Compile Include="ModAPI\IMyInventory.cs" />
+    <Compile Include="ModAPI\IMyLandingGear.cs" />
+    <Compile Include="ModAPI\IMyMotorStator.cs" />
+    <Compile Include="ModAPI\IMyOxygenGenerator.cs" />
+    <Compile Include="ModAPI\IMyParallelTask.cs" />
+    <Compile Include="ModAPI\IMyPistonBase.cs" />
+    <Compile Include="ModAPI\IMyPlayer.cs" />
+    <Compile Include="ModAPI\IMyGamePaths.cs" />
+    <Compile Include="ModAPI\IMyPrefabManager.cs" />
+    <Compile Include="ModAPI\IMyProductionBlock.cs" />
+    <Compile Include="ModAPI\IMyReactor.cs" />
+    <Compile Include="ModAPI\IMySensorBlock.cs" />
+    <Compile Include="ModAPI\IMyShipDrill.cs" />
+    <Compile Include="ModAPI\IMyShipWelder.cs" />
+    <Compile Include="ModAPI\IMySpaceBall.cs" />
+    <Compile Include="ModAPI\IMyTerminalBlock.cs" />
+    <Compile Include="ModAPI\IMyThrust.cs" />
+    <Compile Include="ModAPI\IMyUpgradableBlock.cs" />
+    <Compile Include="ModAPI\IMyUpgradeModule.cs" />
+    <Compile Include="ModAPI\IMyVirtualMass.cs" />
+    <Compile Include="ModAPI\IMyVoxelBase.cs" />
+    <Compile Include="ModAPI\IMyVoxelShape.cs" />
+    <Compile Include="ModAPI\IMyVoxelShapeBox.cs" />
+    <Compile Include="ModAPI\IMyVoxelShapeCapsule.cs" />
+    <Compile Include="ModAPI\IMyVoxelShapeRamp.cs" />
+    <Compile Include="ModAPI\IMyVoxelShapeSphere.cs" />
+    <Compile Include="ModAPI\Ingame\IMyAirVent.cs" />
+    <Compile Include="ModAPI\Ingame\IMyPowerProducer.cs" />
+    <Compile Include="ModAPI\Ingame\IMyRadioAntenna.cs" />
+    <Compile Include="ModAPI\Ingame\IMyAssembler.cs" />
+    <Compile Include="ModAPI\Ingame\IMyBatteryBlock.cs" />
+    <Compile Include="ModAPI\Ingame\IMyBeacon.cs" />
+    <Compile Include="ModAPI\Ingame\IMyBlockGroup.cs" />
+    <Compile Include="ModAPI\Ingame\IMyCameraBlock.cs" />
+    <Compile Include="ModAPI\Ingame\IMyCargoContainer.cs" />
+    <Compile Include="ModAPI\Ingame\IMyCockpit.cs" />
+    <Compile Include="ModAPI\Ingame\IMyCollector.cs" />
+    <Compile Include="ModAPI\Ingame\IMyConveyorSorter.cs" />
+    <Compile Include="ModAPI\Ingame\IMyGravityGenerator.cs" />
+    <Compile Include="ModAPI\Ingame\IMyGravityGeneratorBase.cs" />
+    <Compile Include="ModAPI\Ingame\IMyGravityGeneratorSphere.cs" />
+    <Compile Include="ModAPI\Ingame\IMyGridTerminalSystem.cs" />
+    <Compile Include="ModAPI\Ingame\IMyGyro.cs" />
+    <Compile Include="ModAPI\Ingame\IMyInteriorLight.cs" />
+    <Compile Include="ModAPI\Ingame\IMyLargeConveyorTurretBase.cs" />
+    <Compile Include="ModAPI\Ingame\IMyLargeGatlingTurret.cs" />
+    <Compile Include="ModAPI\Ingame\IMyLargeInteriorTurret.cs" />
+    <Compile Include="ModAPI\Ingame\IMyLargeMissileTurret.cs" />
+    <Compile Include="ModAPI\Ingame\IMyLargeTurretBase.cs" />
+    <Compile Include="ModAPI\Ingame\IMyLaserAntenna.cs" />
+    <Compile Include="ModAPI\Ingame\IMyLightingBlock.cs" />
+    <Compile Include="ModAPI\Ingame\IMyMedicalRoom.cs" />
+    <Compile Include="ModAPI\Ingame\IMyMotorAdvancedStator.cs" />
+    <Compile Include="ModAPI\Ingame\IMyMotorBase.cs" />
+    <Compile Include="ModAPI\Ingame\IMyMotorSuspension.cs" />
+    <Compile Include="ModAPI\Ingame\IMyOreDetector.cs" />
+    <Compile Include="ModAPI\Ingame\IMyOxygenFarm.cs" />
+    <Compile Include="ModAPI\Ingame\IMyOxygenGenerator.cs" />
+    <Compile Include="ModAPI\Ingame\IMyOxygenTank.cs" />
+    <Compile Include="ModAPI\Ingame\IMyProgrammableBlock.cs" />
+    <Compile Include="ModAPI\Ingame\IMyProjector.cs" />
+    <Compile Include="ModAPI\Ingame\IMyReactor.cs" />
+    <Compile Include="ModAPI\Ingame\IMyRefinery.cs" />
+    <Compile Include="ModAPI\Ingame\IMyReflectorLight.cs" />
+    <Compile Include="ModAPI\Ingame\IMyRemoteControl.cs" />
+    <Compile Include="ModAPI\Ingame\IMyShipConnector.cs" />
+    <Compile Include="ModAPI\Ingame\IMyShipController.cs" />
+    <Compile Include="ModAPI\Ingame\IMyShipDrill.cs" />
+    <Compile Include="ModAPI\Ingame\IMyShipGrinder.cs" />
+    <Compile Include="ModAPI\Ingame\IMyShipToolBase.cs" />
+    <Compile Include="ModAPI\Ingame\IMyShipWelder.cs" />
+    <Compile Include="ModAPI\Ingame\IMySmallGatlingGun.cs" />
+    <Compile Include="ModAPI\Ingame\IMySmallMissileLauncher.cs" />
+    <Compile Include="ModAPI\Ingame\IMySmallMissileLauncherReload.cs" />
+    <Compile Include="ModAPI\Ingame\IMySolarPanel.cs" />
+    <Compile Include="ModAPI\Ingame\IMySoundBlock.cs" />
+    <Compile Include="ModAPI\Ingame\IMySpaceBall.cs" />
+    <Compile Include="ModAPI\Ingame\IMyTextPanel.cs" />
+    <Compile Include="ModAPI\Ingame\IMyThrust.cs" />
+    <Compile Include="ModAPI\Ingame\IMyTimerBlock.cs" />
+    <Compile Include="ModAPI\Ingame\IMyUpgradableBlock.cs" />
+    <Compile Include="ModAPI\Ingame\IMyUpgradeModule.cs" />
+    <Compile Include="ModAPI\Ingame\IMyUserControllableGun.cs" />
+    <Compile Include="ModAPI\Ingame\IMyVirtualMass.cs" />
+    <Compile Include="ModAPI\Ingame\IMyControlPanel.cs" />
+    <Compile Include="ModAPI\Ingame\IMyWarhead.cs" />
+    <Compile Include="ModAPI\IMyButtonPanel.cs" />
+    <Compile Include="ModAPI\IMyShipMergeBlock.cs" />
+    <Compile Include="ModAPI\Ingame\PistonStatus.cs" />
+    <Compile Include="ModAPI\Ingame\MyGridProgram.cs" />
+    <Compile Include="ModAPI\Ingame\TerminalActionParameter.cs" />
+    <Compile Include="ModAPI\IMyHudNotification.cs" />
+    <Compile Include="ModAPI\IMyMotorSuspension.cs" />
+    <Compile Include="ModAPI\Interfaces\IMyDestroyableObject.cs" />
+    <Compile Include="ModAPI\IMyIdentity.cs" />
+    <Compile Include="ModAPI\Interfaces\IMyInventoryOwner.cs" />
+    <Compile Include="ModAPI\IMyMultiplayer.cs" />
+    <Compile Include="ModAPI\IMyNetworkClient.cs" />
+    <Compile Include="ModAPI\IMyPlayerCollection.cs" />
+    <Compile Include="ModAPI\Ingame\IMyButtonPanel.cs" />
+    <Compile Include="ModAPI\Ingame\IMyDoor.cs" />
+    <Compile Include="ModAPI\Ingame\IMyFunctionalBlock.cs" />
+    <Compile Include="ModAPI\Interfaces\IMyInventory.cs" />
+    <Compile Include="ModAPI\Ingame\IMyLandingGear.cs" />
+    <Compile Include="ModAPI\Ingame\IMyMotorStator.cs" />
+    <Compile Include="ModAPI\Ingame\IMyPistonBase.cs" />
+    <Compile Include="ModAPI\Ingame\IMyProductionBlock.cs" />
+    <Compile Include="ModAPI\IMySession.cs" />
+    <Compile Include="ModAPI\IMySlimBlock.cs" />
+    <Compile Include="ModAPI\IMyTerminalActionsHelper.cs" />
+    <Compile Include="ModAPI\IMyUtilities.cs" />
+    <Compile Include="ModAPI\IMyVoxelMap.cs" />
+    <Compile Include="ModAPI\IMyVoxelMaps.cs" />
+    <Compile Include="ModAPI\Ingame\IMyCubeBlock.cs" />
+    <Compile Include="ModAPI\Ingame\IMyCubeGrid.cs" />
+    <Compile Include="ModAPI\Ingame\IMySensorBlock.cs" />
+    <Compile Include="ModAPI\Ingame\IMyShipMergeBlock.cs" />
+    <Compile Include="ModAPI\Ingame\IMySlimBlock.cs" />
+    <Compile Include="ModAPI\Ingame\IMyTerminalBlock.cs" />
+    <Compile Include="ModAPI\Interfaces\IControllableEntity.cs" />
+    <Compile Include="ModAPI\Interfaces\IMyCameraController.cs" />
+    <Compile Include="ModAPI\Interfaces\IMyInventoryItem.cs" />
+    <Compile Include="ModAPI\Interfaces\IMyStorage.cs" />
+    <Compile Include="ModAPI\Interfaces\ITerminalProperty.cs" />
+    <Compile Include="ModAPI\Interfaces\ITerminalAction.cs" />
+    <Compile Include="ModAPI\MyAPIGateway.cs" />
+    <Compile Include="ModAPI\MyHitInfo.cs" />
+    <Compile Include="Models\IMyTriangePruningStructure.cs" />
+    <Compile Include="Models\MyIntersectionResultLineTriangle.cs" />
+    <Compile Include="Models\MyMesh.cs" />
+    <Compile Include="Models\MyMeshMaterial.cs" />
+    <Compile Include="MyDefinitionErrors.cs" />
+    <Compile Include="MyEngineConstants.cs" />
+    <Compile Include="MyEnums.cs" />
+    <Compile Include="MyFinalBuildConstants.cs" />
+    <Compile Include="MyMultiplayerWorldData.cs" />
+    <Compile Include="MyPlayerInfo.cs" />
+    <Compile Include="News\MyNews.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VRage.Game\VRage.Game.csproj">
+      <Project>{4539b5f0-3316-40e6-b032-9fbcafaac5be}</Project>
+      <Name>VRage.Game</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VRage.Library\VRage.Library.csproj">
+      <Project>{26fe022e-42ab-40be-ba9d-97cbe34e7d99}</Project>
+      <Name>VRage.Library</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VRage.Math\VRage.Math.csproj">
+      <Project>{40ce67d5-c89f-4a56-ae52-85db1bea07fe}</Project>
+      <Name>VRage.Math</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VRage\VRage.csproj">
+      <Project>{1c814936-c9a7-4faf-b543-28f021d98b6c}</Project>
+      <Name>VRage</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  -->
+</Project>
