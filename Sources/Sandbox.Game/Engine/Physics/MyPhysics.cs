@@ -457,6 +457,11 @@ namespace Sandbox.Engine.Physics
                 world.UnmarkForWrite();
                 world.StepSimulation(MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * MyFakes.SIMULATION_SPEED);
                 world.MarkForWrite();
+
+                //step bubble movement
+                Matrix blmat = bubble.PositionComp.WorldMatrix;
+                blmat.Translation += (bubble.Physics.LinearVelocity * (MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * MyFakes.SIMULATION_SPEED));
+                bubble.PositionComp.WorldMatrix = blmat;
             }
 
             ProfilerShort.End();
@@ -534,7 +539,6 @@ namespace Sandbox.Engine.Physics
             }
 
             ProfilerShort.End();
-
 
         }
 

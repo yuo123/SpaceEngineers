@@ -490,6 +490,11 @@ namespace Sandbox.Game.Entities
         }
         public virtual void UpdateAfterSimulation()
         {
+            if (Physics != null && Physics.InBubble && Physics.Bubble != null)
+            {
+                Physics.Bubble.AddToVelocitySum(Physics.LinearVelocity);
+                Physics.Bubble.AddToPositionsSum(PositionComp.GetPosition());
+            }
             m_gameLogic.UpdateAfterSimulation();
             Debug.Assert(!Closed, "Cannot update entity, entity is closed");
             //if(m_syncObject != null) m_syncObject.Update();

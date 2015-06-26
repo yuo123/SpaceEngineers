@@ -189,6 +189,7 @@ namespace Sandbox.Engine.Utils
 
             // Apply acceleration
             Vector3 acceleration = (Vector3)force / m_currentSpring.Mass;
+            acceleration.AssertIsValid();
             m_velocity += acceleration * MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS;
             m_velocity.AssertIsValid();
 

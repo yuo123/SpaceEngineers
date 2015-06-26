@@ -7157,7 +7157,7 @@ namespace Sandbox.Game.Entities.Character
         {
             MyHud.CharacterInfo.BatteryEnergy = 100 * SuitBattery.RemainingCapacity / MyEnergyConstants.BATTERY_MAX_CAPACITY;
             MyHud.CharacterInfo.IsBatteryEnergyLow = SuitBattery.IsEnergyLow;
-            MyHud.CharacterInfo.Speed = Physics.LinearVelocity.Length();
+            MyHud.CharacterInfo.Speed = Physics.Speed;
             MyHud.CharacterInfo.Mass = (int)((float)GetInventory().CurrentMass + Definition.Mass);
             MyHud.CharacterInfo.LightEnabled = LightEnabled;
             MyHud.CharacterInfo.DampenersEnabled = DampenersEnabled;

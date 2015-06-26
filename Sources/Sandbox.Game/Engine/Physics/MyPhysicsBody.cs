@@ -133,7 +133,10 @@ namespace Sandbox.Engine.Physics
         {
             get
             {
-                return RigidBody.GetRigidBodyInfo().LinearVelocity.Length();
+                Vector3D offset = Vector3D.Zero;
+                if (InBubble && Bubble != null)
+                    offset = Bubble.Physics.LinearVelocity;
+                return CharacterProxy.CharacterRigidBody.LinearVelocity.Length() + (float)offset.Length();
             }
         }
 
@@ -427,7 +430,7 @@ namespace Sandbox.Engine.Physics
             position.AssertIsValid();
             torque.AssertIsValid();
 
-            System.Diagnostics.Debug.Assert(IsInWorld == true);
+            //System.Diagnostics.Debug.Assert(IsInWorld == true);
 
             if (IsStatic)
                 return;
@@ -1421,9 +1424,11 @@ false,
             if (!Enabled)
                 return;
 
-            System.Diagnostics.Debug.Assert(!IsInWorld);
-
-            ClusterObjectID = MyPhysics.Clusters.AddObject(Entity.WorldAABB, LinearVelocity, this, null);
+            //System.Diagnostics.Debug.Assert(!IsInWorld);
+            if (InBubble && Bubble != null)
+                Bubble.AddEntityToBubble(Entity as MyEntity);
+            else
+                ClusterObjectID = MyPhysics.Clusters.AddObject(Entity.WorldAABB, LinearVelocity, this, null);
         }
 
         protected virtual void ActivateCollision(){}
