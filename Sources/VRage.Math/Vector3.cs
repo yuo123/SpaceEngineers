@@ -299,14 +299,7 @@ namespace VRageMath
         public bool IsValid()
         {
             // We can multiply, when one component is infinity, others will be too. When one is NaN, others will be too.
-            //WRONG! if the numbers are big enough, each one can be less than infinity, but the product not.
-            if (!X.IsValid())
-                return false;
-            if (!Y.IsValid())
-                return false;
-            if (!Z.IsValid())
-                return false;
-            return true;
+            return (X * Y * Z).IsValid();
         }
 
         [Conditional("DEBUG")]

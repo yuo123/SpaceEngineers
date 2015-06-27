@@ -24,7 +24,6 @@ using Sandbox.Common.ObjectBuilders.Definitions;
 using System;
 using Sandbox.Game.Multiplayer;
 
-using Sandbox.Game.Bubbles;
 
 #endregion
 
@@ -87,11 +86,6 @@ namespace Sandbox.Engine.Physics
         public static int ThreadId;
 
         public static MyHavokCluster Clusters;
-
-        /// <summary>
-        /// The list of bubbles currently in the world
-        /// </summary>
-        public static List<Bubble> Bubbles;
 
         private static HkJobThreadPool m_threadPool;
         private static HkJobQueue m_jobQueue;
@@ -282,9 +276,6 @@ namespace Sandbox.Engine.Physics
 
             ThreadId = Thread.CurrentThread.ManagedThreadId;
 
-            //create the bubbles list
-            Bubbles = new List<Bubble>();
-
             if(MyPerGameSettings.SingleCluster)
                 Clusters = new MyHavokCluster(MySession.Static.WorldBoundaries);
             else
@@ -432,6 +423,7 @@ namespace Sandbox.Engine.Physics
             if (MyFakes.PAUSE_PHYSICS && !MyFakes.STEP_PHYSICS)
                 return;
             MyFakes.STEP_PHYSICS = false;
+
             if (!MySandboxGame.IsGameReady)
                 return;
 
@@ -439,6 +431,7 @@ namespace Sandbox.Engine.Physics
 
             InsideSimulation = true;
             ProcessDestructions();
+
             ProfilerShort.Begin("HavokWorld.Step");
 
             foreach (HkWorld world in Clusters.GetList())
@@ -447,21 +440,6 @@ namespace Sandbox.Engine.Physics
                 world.UnmarkForWrite();
                 world.StepSimulation(MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * MyFakes.SIMULATION_SPEED);
                 world.MarkForWrite();
-            }
-            
-            //step all bubble physics
-            foreach (Bubble bubble in Bubbles)
-            {
-                HkWorld world = bubble.InternalWorld;
-
-                world.UnmarkForWrite();
-                world.StepSimulation(MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * MyFakes.SIMULATION_SPEED);
-                world.MarkForWrite();
-
-                //step bubble movement
-                Matrix blmat = bubble.PositionComp.WorldMatrix;
-                blmat.Translation += (bubble.Physics.LinearVelocity * (MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * MyFakes.SIMULATION_SPEED));
-                bubble.PositionComp.WorldMatrix = blmat;
             }
 
             ProfilerShort.End();
@@ -475,12 +453,6 @@ namespace Sandbox.Engine.Physics
                 activeRigidBodies += world.ActiveRigidBodies.Count;
             }
 
-            foreach (Bubble bubble in Bubbles)
-            {
-                HkWorld world = bubble.InternalWorld;
-                activeRigidBodies += world.ActiveRigidBodies.Count;
-            }
-
             VRageRender.MyPerformanceCounter.PerCameraDrawWrite["Active rigid bodies"] = activeRigidBodies;
 
             ProfilerShort.CustomValue("Active bodies", activeRigidBodies, null);
@@ -490,11 +462,6 @@ namespace Sandbox.Engine.Physics
                 IterateBodies(world);
             }
 
-            //add bubbles' rigid bodies to iteration bodies
-            foreach (Bubble bubble in Bubbles)
-            {
-                IterateBodies(bubble.InternalWorld);
-            }
 
             //ParallelTasks.Parallel.For(0, m_iterationBodies.Count, (rb) =>
             //{
@@ -515,7 +482,7 @@ namespace Sandbox.Engine.Physics
             foreach (HkCharacterRigidBody rb in m_characterIterationBodies)
             {
                 var body = (MyPhysicsBody)rb.GetHitRigidBody().UserObject;
-                if (!body.InBubble && body.Entity.WorldMatrix.Translation != body.GetWorldMatrix().Translation)
+                if (body.Entity.WorldMatrix.Translation != body.GetWorldMatrix().Translation)
                 {
                     body.UpdateCluster();
                 }
@@ -532,14 +499,7 @@ namespace Sandbox.Engine.Physics
                 world.StepVDB(MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS);
             }
 
-            //step vdb for bubbles
-            foreach (Bubble bubble in Bubbles)
-            {
-                bubble.InternalWorld.StepVDB(MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS);
-            }
-
             ProfilerShort.End();
-
         }
 
 

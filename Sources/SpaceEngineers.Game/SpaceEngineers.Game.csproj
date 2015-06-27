@@ -47,7 +47,7 @@
   <ItemGroup>
     <Reference Include="SteamSDK, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\3rd\SteamSDK\debug\x86\SteamSDK.dll</HintPath>
+      <HintPath>..\..\3rd\SteamSDK\Debug\x64\SteamSDK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -58,6 +58,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Blocks\MyShipWelder.cs" />
+    <Compile Include="Entities\MySpaceBuildComponent.cs" />
     <Compile Include="Entities\UseObjects\MyUseObjectInventory.cs" />
     <Compile Include="Entities\UseObjects\MyUseObjectMedicalRoom.cs" />
     <Compile Include="Entities\UseObjects\MyUseObjectWardrobe.cs" />

@@ -171,7 +171,7 @@ namespace Sandbox.Game.Gui
              () => "Reorder clusters",
              delegate
              {
-                 if (MySession.ControlledEntity != null && !((MyEntity)MySession.ControlledEntity).Physics.InBubble)
+                 if (MySession.ControlledEntity != null)
                  {
                      MySession.ControlledEntity.Entity.GetTopMostParent().Physics.ReorderClusters();
                  }

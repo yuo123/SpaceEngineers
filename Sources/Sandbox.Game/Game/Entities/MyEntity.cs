@@ -85,13 +85,17 @@ namespace Sandbox.Game.Entities
             m_debugRenderers.Add(render);
         }
 
+        public void ClearDebugRenderComponents()
+        {
+            m_debugRenderers.Clear();
+        }
+
         //Rendering
         protected MyModel m_modelCollision;                       //  Collision model, used only for collisions
 
         //Space query structure
         public int GamePruningProxyId = MyConstants.PRUNING_PROXY_ID_UNITIALIZED;
-        public int TargetPruningProxyId = MyConstants.PRUNING_PROXY_ID_UNITIALIZED;
-        public int SensablePruningProxyId = MyConstants.PRUNING_PROXY_ID_UNITIALIZED;
+        public int TopMostPruningProxyId = MyConstants.PRUNING_PROXY_ID_UNITIALIZED;
 
         #endregion
 
@@ -400,6 +404,11 @@ namespace Sandbox.Game.Entities
 
         //public StackTrace CreationStack = new StackTrace(true);
 
+        public MyEntity()
+            : this(true)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MyEntity"/> class.
         /// </summary>
@@ -490,11 +499,6 @@ namespace Sandbox.Game.Entities
         }
         public virtual void UpdateAfterSimulation()
         {
-            if (Physics != null && Physics.InBubble && Physics.Bubble != null)
-            {
-                Physics.Bubble.AddToVelocitySum(Physics.LinearVelocity);
-                Physics.Bubble.AddToPositionsSum(PositionComp.GetPosition());
-            }
             m_gameLogic.UpdateAfterSimulation();
             Debug.Assert(!Closed, "Cannot update entity, entity is closed");
             //if(m_syncObject != null) m_syncObject.Update();
@@ -799,24 +803,12 @@ namespace Sandbox.Game.Entities
 
         #region Entity events
 
+        /// <summary>
         /// Called when [activated] which for entity means that was added to scene.
         /// </summary>
         /// <param name="source">The source of activation.</param>
         public virtual void OnAddedToScene(object source)
         {
-
-            OnAddedToScene(source, null);
-        }
-
-        /// <summary>
-        /// Called when [activated] which for entity means that was added to scene.
-        /// </summary>
-        /// <param name="source">The source of activation.</param>
-        /// <param name="world">The HkWorld to insert the entity into</param>
-        public virtual void OnAddedToScene(object source, HkWorld world)
-        {
-
-
             System.Diagnostics.Debug.Assert(InScene == false, "Object was inserted twice into the scene");
             System.Diagnostics.Debug.Assert((EntityId != 0 && Save) || !Save);
 
@@ -837,13 +829,7 @@ namespace Sandbox.Game.Entities
             if (this.m_physics != null)
             {
                 VRageRender.MyRenderProxy.GetRenderProfiler().StartProfilingBlock("m_physics.Activate");
-
-                if (world != null)
-                    this.m_physics.Activate(world, 0);
-                else
-                    this.m_physics.Activate();
-
-
+                this.m_physics.Activate();
                 VRageRender.MyRenderProxy.GetRenderProfiler().EndProfilingBlock();
             }
 
@@ -851,27 +837,23 @@ namespace Sandbox.Game.Entities
             AddToGamePruningStructure();
             VRageRender.MyRenderProxy.GetRenderProfiler().EndProfilingBlock();
 
+            Components.OnAddedToScene();
 
             foreach (var child in Hierarchy.Children)
             {
-                child.Entity.OnAddedToScene(source);
-
-            }
-            foreach (var child in Hierarchy.Children)
-            {
-                if (!child.Container.Entity.InScene)
                 child.Container.Entity.OnAddedToScene(source);
-
             }
 
             if (MyFakes.ENABLE_ASTEROID_FIELDS)
             {
-                Sandbox.Game.World.Generator.MyAsteroidCellGenerator.Static.TrackEntity(this);
+                if (Sandbox.Game.World.Generator.MyProceduralWorldGenerator.Static != null)
+                {
+                    Sandbox.Game.World.Generator.MyProceduralWorldGenerator.Static.TrackEntity(this);
+                }
             }
 
             VRageRender.MyRenderProxy.GetRenderProfiler().EndProfilingBlock();
         }
-        
 
 
         public virtual void OnRemovedFromScene(object source)
@@ -885,6 +867,8 @@ namespace Sandbox.Game.Entities
                     child.Container.Entity.OnRemovedFromScene(source);
                 }
             }
+
+            Components.OnRemovedFromScene();
 
             MyEntities.UnregisterForUpdate(this);
             MyEntities.UnregisterForDraw(this);
@@ -930,6 +914,8 @@ namespace Sandbox.Game.Entities
         public virtual void Init(MyObjectBuilder_EntityBase objectBuilder)
         {
             ProfilerShort.Begin("MyEntity.Init(objectBuilder)");
+            MarkedForClose = false;
+            Closed = false;
             this.Render.PersistentFlags = MyPersistentEntityFlags2.CastShadows;
             if (objectBuilder != null)
             {
@@ -1002,6 +988,8 @@ namespace Sandbox.Game.Entities
                          string modelCollision = null)
         {
             ProfilerShort.Begin("MyEntity.Init(...models...)");
+            MarkedForClose = false;
+            Closed = false;
             this.Render.PersistentFlags = MyPersistentEntityFlags2.CastShadows;
             this.DisplayName = displayName != null ? displayName.ToString() : null;
 
@@ -1165,6 +1153,8 @@ namespace Sandbox.Game.Entities
             CallAndClearOnClose();
 
 			Components.Clear();
+
+            ClearDebugRenderComponents();
 
             Closed = true;
         }

@@ -26,7 +26,6 @@ using VRage;
 using Sandbox.Common.Components;
 using VRageMath.Spatial;
 using Sandbox.Game;
-using Sandbox.Game.Bubbles;
 
 #endregion
 
@@ -49,12 +48,6 @@ namespace Sandbox.Engine.Physics
     /// </summary>
     public class MyPhysicsBody : MyPhysicsComponentBase, MyClusterTree.IMyActivationHandler
     {
-        public bool InBubble { get; set; }
-        /// <summary>
-        /// The physics bubble this physics body is in. Null if not using bubbles.
-        /// </summary>
-        public Bubble Bubble { get; set; }
-
         public static bool HkGridShapeCellDebugDraw = false;
 
         private Vector3 m_lastLinearVelocity;
@@ -133,10 +126,7 @@ namespace Sandbox.Engine.Physics
         {
             get
             {
-                Vector3D offset = Vector3D.Zero;
-                if (InBubble && Bubble != null)
-                    offset = Bubble.Physics.LinearVelocity;
-                return CharacterProxy.CharacterRigidBody.LinearVelocity.Length() + (float)offset.Length();
+                return RigidBody.GetRigidBodyInfo().LinearVelocity.Length();
             }
         }
 
@@ -430,7 +420,7 @@ namespace Sandbox.Engine.Physics
             position.AssertIsValid();
             torque.AssertIsValid();
 
-            //System.Diagnostics.Debug.Assert(IsInWorld == true);
+            System.Diagnostics.Debug.Assert(IsInWorld == true);
 
             if (IsStatic)
                 return;
@@ -1225,7 +1215,7 @@ namespace Sandbox.Engine.Physics
             MyPhysicalMaterialDefinition def = bDef.PhysicalMaterial;
 
             MySoundPair destructionCue;
-            if (def.GeneralSounds.TryGetValue(m_destructionSound, out destructionCue) && destructionCue.SoundId != MyStringId.NullOrEmpty)
+            if (def.GeneralSounds.TryGetValue(m_destructionSound, out destructionCue) && !destructionCue.SoundId.IsNull)
             {
                 var emmiter = MyAudioComponent.TryGetSoundEmitter();
                 if (emmiter == null)
@@ -1299,7 +1289,7 @@ namespace Sandbox.Engine.Physics
             cue = MyMaterialSoundsHelper.Static.GetCollisionCue(m_startCue, bodyA.GetMaterialAt(worldPos + value.ContactPoint.Normal * 0.1f), bodyB.GetMaterialAt(worldPos - value.ContactPoint.Normal * 0.1f));
             //cue = MyMaterialsConstants.GetCollisionCue(MyMaterialsConstants.MyMaterialCollisionType.Start, value.Base.BodyA.GetBody().MaterialType, value.Base.BodyB.GetBody().MaterialType);
 
-            if (cue.SoundId != MyStringId.NullOrEmpty)
+            if (!cue.SoundId.IsNull)
             {
                 MyEntity3DSoundEmitter emitter;
                 {
@@ -1424,11 +1414,9 @@ false,
             if (!Enabled)
                 return;
 
-            //System.Diagnostics.Debug.Assert(!IsInWorld);
-            if (InBubble && Bubble != null)
-                Bubble.AddEntityToBubble(Entity as MyEntity);
-            else
-                ClusterObjectID = MyPhysics.Clusters.AddObject(Entity.WorldAABB, LinearVelocity, this, null);
+            System.Diagnostics.Debug.Assert(!IsInWorld);
+
+            ClusterObjectID = MyPhysics.Clusters.AddObject(Entity.WorldAABB, LinearVelocity, this, null);
         }
 
         protected virtual void ActivateCollision(){}
@@ -1689,6 +1677,22 @@ false,
             set { m_isStaticForCluster = value; }
         }
 
+        public Vector3 Gravity
+        {
+            get
+            {
+                if (!Enabled)
+                    return Vector3.Zero;
+
+                if (RigidBody != null)
+                    return this.RigidBody.Gravity;
+
+                if (CharacterProxy != null)
+                    return CharacterProxy.Gravity;
+
+                return Vector3.Zero;
+            }
+        }
         #endregion
 
         #region Implementation of IMyNotifyMotion
@@ -1740,12 +1744,9 @@ false,
                 ProfilerShort.End();
             }
 
-            if (!InBubble)
-            {
-                ProfilerShort.Begin("UpdateCluster");
-                UpdateCluster();
-                ProfilerShort.End();
-            }
+            ProfilerShort.Begin("UpdateCluster");
+            UpdateCluster();
+            ProfilerShort.End();
 
             ProfilerShort.End();
         }
@@ -1762,12 +1763,7 @@ false,
             Vector3 transformedCenter;
             MatrixD entityMatrix = MatrixD.Identity;
             Matrix rbWorld;
-
-            Vector3D offset = Vector3D.Zero;
-            if (InBubble)
-                offset = Bubble.PositionComp.GetPosition();
-            else
-                offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
+            var offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
 
             if (RigidBody2 != null)
             {
@@ -1868,8 +1864,7 @@ false,
             {
                 velocity = parentEntity.Physics.LinearVelocity;
             }
-            if (!InBubble)
-                MyPhysics.Clusters.MoveObject(ClusterObjectID, Entity.WorldAABB, Entity.WorldAABB, velocity);
+            MyPhysics.Clusters.MoveObject(ClusterObjectID, Entity.WorldAABB, Entity.WorldAABB, velocity);
 
             //if (m_motionState != null)
             //{
@@ -1918,11 +1913,7 @@ false,
 
             Vector3 transformedCenter = Vector3.TransformNormal(Center, Entity.WorldMatrix);
 
-            var offset = Vector3D.Zero;
-            if (InBubble)
-                offset = Bubble.PositionComp.GetPosition();
-            else
-                offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
+            var offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
 
             Matrix rigidBodyMatrix = Matrix.CreateWorld((Vector3)((Vector3D)transformedCenter + Entity.GetPosition() - (Vector3D)offset), Entity.WorldMatrix.Forward, Entity.WorldMatrix.Up);
             return rigidBodyMatrix;
@@ -1934,11 +1925,7 @@ false,
 
             Vector3 transformedCenter = Vector3.TransformNormal(Center, worldMatrix);
 
-            var offset = Vector3D.Zero;
-            if (InBubble)
-                offset = Bubble.PositionComp.GetPosition();
-            else
-                offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
+            var offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
 
             Matrix rigidBodyMatrix = Matrix.CreateWorld((Vector3)((Vector3D)transformedCenter + worldMatrix.Translation - (Vector3D)offset), worldMatrix.Forward, worldMatrix.Up);
             return rigidBodyMatrix;
@@ -2291,6 +2278,12 @@ false,
                 else if (constraint.ConstraintData is HkHingeConstraintData)
                 {
                     var constraintData = constraint.ConstraintData as HkHingeConstraintData;
+                    constraintData.MaximumAngularImpulse = 3.40282e28f;
+                    constraintData.MaximumLinearImpulse = 3.40282e28f;
+                }
+                else if (constraint.ConstraintData is HkLimitedHingeConstraintData)
+                {
+                    var constraintData = constraint.ConstraintData as HkLimitedHingeConstraintData;
                     constraintData.MaximumAngularImpulse = 3.40282e28f;
                     constraintData.MaximumLinearImpulse = 3.40282e28f;
                 }
