@@ -285,7 +285,8 @@ namespace VRageMath.Spatial
 
         public void MoveObject(ulong id, BoundingBoxD oldAabb, BoundingBoxD aabb, Vector3 velocity)
         {
-            System.Diagnostics.Debug.Assert(id != CLUSTERED_OBJECT_ID_UNITIALIZED, "Unitialized object in cluster!");
+            //MTODO: does removing this has any implications?
+            //System.Diagnostics.Debug.Assert(id != CLUSTERED_OBJECT_ID_UNITIALIZED, "Unitialized object in cluster!");
 
             MyObjectData objectData;
             if (m_objectsData.TryGetValue(id, out objectData))

@@ -9,6 +9,11 @@ namespace VRageRender
     {
         public uint ID;
 
+        public MyRenderMessageRemoveRenderObject()
+        {
+            return;
+        }
+
         MyRenderMessageType IMyRenderMessage.MessageClass { get { return MyRenderMessageType.StateChangeOnce; } }
         MyRenderMessageEnum IMyRenderMessage.MessageType { get { return MyRenderMessageEnum.RemoveRenderObject; } }
     }

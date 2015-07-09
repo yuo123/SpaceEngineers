@@ -18,7 +18,7 @@ namespace VRageRender
     {
         private static void ProcessMessage(IMyRenderMessage message)
         {
-            try
+            //try
             {
                 MyRender.GetRenderProfiler().StartProfilingBlock(MyEnum<MyRenderMessageType>.GetName(message.MessageClass));
                 MyRender.GetRenderProfiler().StartProfilingBlock(Partition.Select(MyEnum<MyRenderMessageEnum>.GetName(message.MessageType).GetHashCode(), "A", "B", "C", "D", "E", "F", "G", "H", "I"));
@@ -28,15 +28,15 @@ namespace VRageRender
                 MyRender.GetRenderProfiler().EndProfilingBlock();
                 MyRender.GetRenderProfiler().EndProfilingBlock();
             }
-            catch
-            {
-                if (message != null)
-                {
-                    MyLog.Default.WriteLine("Error processing message: " + message.MessageType);
-                    MyLog.Default.WriteLine("Details: " + message.ToString());
-                }
-                throw;
-            }
+            //catch (Exception e)
+            //{
+            //    if (message != null)
+            //    {
+            //        MyLog.Default.WriteLine("Error processing message: " + message.MessageType);
+            //        MyLog.Default.WriteLine("Details: " + message.ToString());
+            //    }
+            //    throw e;
+            //}
         }
 
         private static void ProcessMessageInternal(IMyRenderMessage message)
@@ -308,7 +308,9 @@ namespace VRageRender
                         var rMessage = (MyRenderMessageUpdateRenderCubeInstanceBuffer)message;
 
                         var obj = (MyRenderInstanceBuffer)GetRenderObject(rMessage.ID);
-                        obj.UpdateCube(rMessage.InstanceData, rMessage.Capacity);
+
+                        if (obj != null)
+                            obj.UpdateCube(rMessage.InstanceData, rMessage.Capacity);
 
                         rMessage.InstanceData.Clear();
 

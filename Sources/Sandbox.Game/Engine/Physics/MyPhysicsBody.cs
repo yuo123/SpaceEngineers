@@ -26,6 +26,7 @@ using VRage;
 using Sandbox.Common.Components;
 using VRageMath.Spatial;
 using Sandbox.Game;
+using Sandbox.Game.Bubbles;
 
 #endregion
 
@@ -48,6 +49,12 @@ namespace Sandbox.Engine.Physics
     /// </summary>
     public class MyPhysicsBody : MyPhysicsComponentBase, MyClusterTree.IMyActivationHandler
     {
+        public bool InBubble { get; set; }
+        /// <summary>
+        /// The physics bubble this physics body is in. Null if not using bubbles.
+        /// </summary>
+        public Bubble Bubble { get; set; }
+
         public static bool HkGridShapeCellDebugDraw = false;
 
         private Vector3 m_lastLinearVelocity;
@@ -126,7 +133,10 @@ namespace Sandbox.Engine.Physics
         {
             get
             {
-                return RigidBody.GetRigidBodyInfo().LinearVelocity.Length();
+                Vector3D offset = Vector3D.Zero;
+                if (InBubble && Bubble != null)
+                    offset = Bubble.Physics.LinearVelocity;
+                return CharacterProxy.CharacterRigidBody.LinearVelocity.Length() + (float)offset.Length();
             }
         }
 
@@ -1414,9 +1424,11 @@ false,
             if (!Enabled)
                 return;
 
-            System.Diagnostics.Debug.Assert(!IsInWorld);
-
-            ClusterObjectID = MyPhysics.Clusters.AddObject(Entity.WorldAABB, LinearVelocity, this, null);
+            //System.Diagnostics.Debug.Assert(!IsInWorld);
+            if (InBubble && Bubble != null)
+                Bubble.AddEntityToBubble((MyEntity)Entity, false);
+            else
+                ClusterObjectID = MyPhysics.Clusters.AddObject(Entity.WorldAABB, LinearVelocity, this, null);
         }
 
         protected virtual void ActivateCollision(){}
@@ -1733,20 +1745,17 @@ false,
                 ProfilerShort.End();
             }
 
-            if (LinearVelocity.LengthSquared() > 0.000005f || AngularVelocity.LengthSquared() > 0.000005f)
+            //if (LinearVelocity.LengthSquared() > 0.000005f || AngularVelocity.LengthSquared() > 0.000005f)
             {
-                ProfilerShort.Begin("GetWorldMatrix");
-                var matrix = GetWorldMatrix();
-                ProfilerShort.End();
-
-                ProfilerShort.Begin("SetWorldMatrix");
-                this.Entity.PositionComp.SetWorldMatrix(matrix, this);
-                ProfilerShort.End();
+                OnLocalPositionChanged();
             }
 
-            ProfilerShort.Begin("UpdateCluster");
-            UpdateCluster();
-            ProfilerShort.End();
+            if (!InBubble)
+            {
+                ProfilerShort.Begin("UpdateCluster");
+                UpdateCluster();
+                ProfilerShort.End();
+            }
 
             ProfilerShort.End();
         }
@@ -1757,43 +1766,74 @@ false,
                 MyPhysics.Clusters.MoveObject(ClusterObjectID, Entity.WorldAABB, Entity.WorldAABB, Entity.GetTopMostParent().Physics.LinearVelocity);
         }
 
-
-        public override MatrixD GetWorldMatrix()
+        public Matrix GetLocalMatrix()
         {
             Vector3 transformedCenter;
             MatrixD entityMatrix = MatrixD.Identity;
             Matrix rbWorld;
-            var offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
 
             if (RigidBody2 != null)
             {
                 rbWorld = RigidBody2.GetRigidBodyMatrix();
                 transformedCenter = Vector3.TransformNormal(Center, rbWorld);
-                entityMatrix = MatrixD.CreateWorld(rbWorld.Translation - transformedCenter + offset, rbWorld.Forward, rbWorld.Up);
+                entityMatrix = MatrixD.CreateWorld(rbWorld.Translation - transformedCenter, rbWorld.Forward, rbWorld.Up);
             }
             else if (RigidBody != null)
             {
                 rbWorld = RigidBody.GetRigidBodyMatrix();
                 transformedCenter = Vector3.TransformNormal(Center, rbWorld);
-                entityMatrix = MatrixD.CreateWorld(rbWorld.Translation - transformedCenter + offset, rbWorld.Forward, rbWorld.Up);
+                entityMatrix = MatrixD.CreateWorld(rbWorld.Translation - transformedCenter, rbWorld.Forward, rbWorld.Up);
             }
             else if (CharacterProxy != null)
             {
                 MatrixD characterTransform = CharacterProxy.GetRigidBodyTransform();
-                //MatrixD characterTransform = MatrixD.CreateWorld(CharacterProxy.Position, CharacterProxy.Forward, CharacterProxy.Up);
-            
+
                 transformedCenter = Vector3.TransformNormal(Center, characterTransform);
-                characterTransform.Translation = CharacterProxy.Position - transformedCenter + offset;
+                characterTransform.Translation = CharacterProxy.Position - transformedCenter;
                 entityMatrix = characterTransform;
             }
             else if (Ragdoll != null & IsRagdollModeActive)
             {
                 Ragdoll.UpdateWorldMatrixAfterSimulation();
                 entityMatrix = Ragdoll.GetRagdollWorldMatrix();
-                entityMatrix.Translation = entityMatrix.Translation + offset;
+                entityMatrix.Translation = entityMatrix.Translation;
             }
 
             return entityMatrix;
+        }
+
+        public override MatrixD GetWorldMatrix()
+        {
+            Vector3D offset = Vector3D.Zero;
+            if (InBubble && Bubble != null)
+                offset = Bubble.PositionComp.GetPosition();
+            else
+                offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
+
+            MatrixD entityMatrix = GetLocalMatrix();
+
+            entityMatrix.Translation += offset;
+
+            return entityMatrix;
+        }
+
+        public void SetLocalPosition(Vector3 pos)
+        {
+            if (RigidBody != null)
+            {
+                var rb = RigidBody;
+                rb.Position = pos;
+            }
+            if (RigidBody2 != null)
+            {
+                var rb = RigidBody2;
+                rb.Position = pos;
+            }
+            if (CharacterProxy != null && CharacterProxy.CharacterRigidBody != null)
+            {
+                var rb = CharacterProxy.CharacterRigidBody;
+                rb.Position = pos;
+            }
         }
 
         //public MatrixD GetRigidBodyMatrix()
@@ -1857,14 +1897,15 @@ false,
 
             Debug.Assert(this != source, "Recursion!");
 
-            var oldWorld = m_world;
+            var oldWorld = m_world; //if (this.Entity is MyCharacter) Debugger.Break();
             Vector3 velocity = Vector3.Zero;
             IMyEntity parentEntity = Entity.GetTopMostParent();
             if (parentEntity != null && parentEntity.Physics != null)
             {
                 velocity = parentEntity.Physics.LinearVelocity;
             }
-            MyPhysics.Clusters.MoveObject(ClusterObjectID, Entity.WorldAABB, Entity.WorldAABB, velocity);
+            if (!InBubble)
+                MyPhysics.Clusters.MoveObject(ClusterObjectID, Entity.WorldAABB, Entity.WorldAABB, velocity);
 
             //if (m_motionState != null)
             //{
@@ -1907,25 +1948,42 @@ false,
             //}
         }
 
-        protected Matrix GetRigidBodyMatrix()
+        public void OnLocalPositionChanged()
         {
-            System.Diagnostics.Debug.Assert(ClusterObjectID != MyHavokCluster.CLUSTERED_OBJECT_ID_UNITIALIZED, "Unitialized object in cluster!");
+            MatrixD mat = GetWorldMatrix();
+            Entity.SetWorldMatrix(mat);
+        }
+
+        public Matrix GetRigidBodyMatrix()
+        {
+            //return GetLocalMatrix();
+            //MTODO: possibly remove?
+            //if (!((MyPhysicsBody)Entity.Hierarchy.GetTopMostParent().Entity.Physics).InBubble)
+            //    System.Diagnostics.Debug.Assert(ClusterObjectID != MyHavokCluster.CLUSTERED_OBJECT_ID_UNITIALIZED, "Unitialized object in cluster!");
 
             Vector3 transformedCenter = Vector3.TransformNormal(Center, Entity.WorldMatrix);
 
-            var offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
+            var offset = Vector3D.Zero;
+            if (InBubble && Bubble != null)
+                offset = Bubble.PositionComp.GetPosition();
+            else
+                offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
 
             Matrix rigidBodyMatrix = Matrix.CreateWorld((Vector3)((Vector3D)transformedCenter + Entity.GetPosition() - (Vector3D)offset), Entity.WorldMatrix.Forward, Entity.WorldMatrix.Up);
             return rigidBodyMatrix;
         }
 
-        protected Matrix GetRigidBodyMatrix(MatrixD worldMatrix)
+        public Matrix GetRigidBodyMatrix(MatrixD worldMatrix)
         {
             System.Diagnostics.Debug.Assert(ClusterObjectID != MyHavokCluster.CLUSTERED_OBJECT_ID_UNITIALIZED, "Unitialized object in cluster!");
 
             Vector3 transformedCenter = Vector3.TransformNormal(Center, worldMatrix);
 
-            var offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
+            var offset = Vector3D.Zero;
+            if (InBubble)
+                offset = Bubble.PositionComp.GetPosition();
+            else
+                offset = MyPhysics.Clusters.GetObjectOffset(ClusterObjectID);
 
             Matrix rigidBodyMatrix = Matrix.CreateWorld((Vector3)((Vector3D)transformedCenter + worldMatrix.Translation - (Vector3D)offset), worldMatrix.Forward, worldMatrix.Up);
             return rigidBodyMatrix;

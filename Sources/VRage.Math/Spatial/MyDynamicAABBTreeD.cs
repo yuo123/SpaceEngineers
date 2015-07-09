@@ -183,6 +183,8 @@ namespace VRageMath
         {
             using (m_rwLock.AcquireExclusiveUsing())
             {
+                if (!(0 <= proxyId && proxyId < _nodeCapacity))
+                    return false;
                 System.Diagnostics.Debug.Assert(0 <= proxyId && proxyId < _nodeCapacity);
                 System.Diagnostics.Debug.Assert(_nodes[proxyId].IsLeaf());
 

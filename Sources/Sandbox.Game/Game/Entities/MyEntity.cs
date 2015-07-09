@@ -500,6 +500,11 @@ namespace Sandbox.Game.Entities
         public virtual void UpdateAfterSimulation()
         {
             m_gameLogic.UpdateAfterSimulation();
+            if (Physics != null && Physics.InBubble && Physics.Bubble != null)
+            {
+                Physics.Bubble.AddToVelocitySum(Physics.LinearVelocity);
+                Physics.Bubble.AddToPositionsSum(Physics.GetRigidBodyMatrix().Translation);
+            }
             Debug.Assert(!Closed, "Cannot update entity, entity is closed");
             //if(m_syncObject != null) m_syncObject.Update();
         }
@@ -809,6 +814,19 @@ namespace Sandbox.Game.Entities
         /// <param name="source">The source of activation.</param>
         public virtual void OnAddedToScene(object source)
         {
+
+            OnAddedToScene(source, null);
+        }
+
+        /// <summary>
+        /// Called when [activated] which for entity means that was added to scene.
+        /// </summary>
+        /// <param name="source">The source of activation.</param>
+        /// <param name="world">The HkWorld to insert the entity into</param>
+        public virtual void OnAddedToScene(object source, HkWorld world)
+        {
+
+
             System.Diagnostics.Debug.Assert(InScene == false, "Object was inserted twice into the scene");
             System.Diagnostics.Debug.Assert((EntityId != 0 && Save) || !Save);
 
@@ -829,7 +847,13 @@ namespace Sandbox.Game.Entities
             if (this.m_physics != null)
             {
                 VRageRender.MyRenderProxy.GetRenderProfiler().StartProfilingBlock("m_physics.Activate");
-                this.m_physics.Activate();
+
+                if (world != null)
+                    this.m_physics.Activate(world, VRageMath.Spatial.MyClusterTree.CLUSTERED_OBJECT_ID_UNITIALIZED);
+                else
+                    this.m_physics.Activate();
+
+
                 VRageRender.MyRenderProxy.GetRenderProfiler().EndProfilingBlock();
             }
 
@@ -841,7 +865,14 @@ namespace Sandbox.Game.Entities
 
             foreach (var child in Hierarchy.Children)
             {
+                ((MyEntity)child.Entity).OnAddedToScene(source, world);
+
+            }
+            foreach (var child in Hierarchy.Children)
+            {
+                if (!child.Container.Entity.InScene)
                 child.Container.Entity.OnAddedToScene(source);
+
             }
 
             if (MyFakes.ENABLE_ASTEROID_FIELDS)
@@ -855,8 +886,12 @@ namespace Sandbox.Game.Entities
             VRageRender.MyRenderProxy.GetRenderProfiler().EndProfilingBlock();
         }
 
-
         public virtual void OnRemovedFromScene(object source)
+        {
+            OnRemovedFromScene(source, null);
+        }
+
+        public virtual void OnRemovedFromScene(object source, HkWorld world)
         {
             InScene = false;
 
@@ -864,7 +899,7 @@ namespace Sandbox.Game.Entities
             {
                 foreach (var child in Hierarchy.Children)
                 {
-                    child.Container.Entity.OnRemovedFromScene(source);
+                    ((MyEntity)child.Container.Entity).OnRemovedFromScene(source, world);
                 }
             }
 
@@ -875,7 +910,10 @@ namespace Sandbox.Game.Entities
 
             if (this.m_physics != null && this.m_physics.Enabled)
             {
-                this.m_physics.Deactivate();
+                if (world == null)
+                    this.m_physics.Deactivate();
+                else
+                    this.m_physics.Deactivate(world);
             }
 
             Render.RemoveRenderObjects();
@@ -1088,7 +1126,7 @@ namespace Sandbox.Game.Entities
         /// <remarks>
         /// </remarks>
         /// </summary>
-        public void Delete()
+        public virtual void Delete()
         {
             Close();
             BeforeDelete();
@@ -1096,7 +1134,7 @@ namespace Sandbox.Game.Entities
             //doesnt work in parallel update
             //Debug.Assert(MySandboxGame.IsMainThread(), "Entity.Close() called not from Main Thread!");
             Debug.Assert(MyEntities.UpdateInProgress == false, "Do not close entities directly in Update*, use MarkForClose() instead");
-            Debug.Assert(MyEntities.CloseAllowed == true, "Use MarkForClose()");
+            Debug.Assert((this is Sandbox.Game.Bubbles.Bubble) || MyEntities.CloseAllowed == true, "Use MarkForClose()");
             Debug.Assert(!Closed, "Close() called twice!");
 
             //Children has to be cleared after close notification is send

@@ -13,7 +13,8 @@ namespace VRageRender
         MyConcurrentPool<MyUpdateFrame> m_frameDataPool;
         MyConcurrentQueue<MyUpdateFrame> m_updateDataQueue;
 
-        public MyUpdateFrame CurrentUpdateFrame { get; private set; }
+        private MyUpdateFrame curupframe;
+        public MyUpdateFrame CurrentUpdateFrame { get { return curupframe; } private set { curupframe = value; } }
 
         public MyUpdateData()
         {

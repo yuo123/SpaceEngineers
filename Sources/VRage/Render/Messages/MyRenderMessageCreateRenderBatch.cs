@@ -23,6 +23,11 @@ namespace VRageRender
 
     public class MyRenderMessageUpdateRenderCubeInstanceBuffer : IMyRenderMessage
     {
+        public MyRenderMessageUpdateRenderCubeInstanceBuffer()
+        {
+            return;
+        }
+
         public uint ID;
         public List<MyCubeInstanceData> InstanceData = new List<MyCubeInstanceData>();
         public int Capacity;

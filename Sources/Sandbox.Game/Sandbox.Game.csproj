@@ -23,7 +23,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WINDOWS /Od</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -355,6 +355,9 @@
     <Compile Include="Game\AI\Pathfinding\MyVoxelPathfinding.cs" />
     <Compile Include="Game\AI\Pathfinding\MyNavmeshComponents.cs" />
     <Compile Include="Game\Audio\MyAudioExtensions.cs" />
+    <Compile Include="Game\Bubbles\Bubble.cs" />
+    <Compile Include="Game\Bubbles\BubblePhysicsBody.cs" />
+    <Compile Include="Game\Bubbles\BubblesComponent.cs" />
     <Compile Include="Game\Components\DebugRenders\MyDebugRenderCompomentDrawDrillBase.cs" />
     <Compile Include="Game\Components\DebugRenders\MyDebugRenderComponentCharacter.cs" />
     <Compile Include="Game\Components\DebugRenders\MyDebugRenderComponentCubeGrid.cs" />

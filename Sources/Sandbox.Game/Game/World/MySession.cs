@@ -1208,6 +1208,10 @@ namespace Sandbox.Game.World
 
             MyLog.Default.WriteLineAndConsole("Session loaded");
             ProfilerShort.End();
+
+            //========BUBBLE DEBUG CODE =======
+            Bubbles.Bubble.CreateDebugBubble();
+            //=================================
         }
 
         internal static void CreateWithEmptyWorld(MyMultiplayerBase multiplayerSession)
@@ -1459,7 +1463,7 @@ namespace Sandbox.Game.World
             LoadCamera(checkpoint);
 
             //fix: saved in survival with dead player, changed to creative, loaded game, no character with no way to respawn
-            if (CreativeMode && !MySandboxGame.IsDedicated && LocalHumanPlayer != null && LocalHumanPlayer.Character!=null && LocalHumanPlayer.Character.IsDead)
+            if (CreativeMode && !MySandboxGame.IsDedicated && LocalHumanPlayer != null && LocalHumanPlayer.Character != null && LocalHumanPlayer.Character.IsDead)
                 MyPlayerCollection.RequestLocalRespawn();
 
             // Create the player if he/she does not exist (on clients and server)

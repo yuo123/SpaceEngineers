@@ -1216,16 +1216,17 @@ namespace Sandbox.Game.Entities
             }
         }
 
-        public override void OnAddedToScene(object source)
+        public override void OnAddedToScene(object source, HkWorld world)
         {
-            base.OnAddedToScene(source);
+            base.OnAddedToScene(source, world);
+
             MyCubeGridGroups.Static.AddNode(GridLinkTypeEnum.Logical, this);
             MyCubeGridGroups.Static.AddNode(GridLinkTypeEnum.Physical, this);
         }
 
-        public override void OnRemovedFromScene(object source)
+        public override void OnRemovedFromScene(object source, HkWorld world)
         {
-            base.OnRemovedFromScene(source);
+            base.OnRemovedFromScene(source, world);
             MyCubeGridGroups.Static.RemoveNode(GridLinkTypeEnum.Physical, this);
             MyCubeGridGroups.Static.RemoveNode(GridLinkTypeEnum.Logical, this);
         }

@@ -12,6 +12,9 @@ using Sandbox.Common.ObjectBuilders;
 using Sandbox.Game.World;
 using Sandbox.Engine.Physics;
 using VRageMath;
+using Sandbox.ModAPI;
+using VRage.ModAPI;
+using VRage;
 
 namespace Sandbox.Game.Bubbles
 {
@@ -19,16 +22,17 @@ namespace Sandbox.Game.Bubbles
     {
         /*
         //MTODO: To-do list:
-         Add methods to add and remove objects from bubble
          Implement bubble "transitions" inside UpdateAfterSimulation
+         don't execute "transitions"  every frame. implement a counter.
         */
 
         #region fields
 
-        private HkWorld m_internWorld;
-        private Vector3D velSum;
-        private Vector3D posSum;
-        private HashSet<MyEntity> entities;
+        protected HkWorld m_internWorld;
+        protected Vector3D velSum;
+        protected Vector3D posSum;
+        protected HashSet<MyEntity> m_entities;
+        protected BoundingBoxD extents;
 
         #endregion
 
@@ -46,6 +50,7 @@ namespace Sandbox.Game.Bubbles
                 return velSum;
             }
         }
+
         public Vector3D PositionsSum
         {
             get
@@ -54,24 +59,34 @@ namespace Sandbox.Game.Bubbles
             }
         }
 
+        public BoundingBoxD Extents
+        {
+            get
+            {
+                return extents;
+            }
+        }
+
         #endregion
 
         public Bubble()
         {
             m_internWorld = MyPhysics.CreateHkWorld(200);
-            entities = new HashSet<MyEntity>();
+            m_entities = new HashSet<MyEntity>();
+            extents = new BoundingBoxD();
+            Physics = new BubblePhysicsBody(this, VRage.Components.RigidBodyFlag.RBF_DISABLE_COLLISION_RESPONSE);
+            Save = false;
+            //because of a lack of documentation, I don't know how this value should be assgined, but this seems to work.
+            EntityId = MyEntityIdentifier.AllocateId();
         }
 
         public static void CreateDebugBubble()
         {
             Bubble re = new Bubble();
-            re.EntityId = 500;
-            re.Save = false;
 
-            re.Physics = new BubblePhysicsBody(re, VRage.Components.RigidBodyFlag.RBF_DISABLE_COLLISION_RESPONSE);
             string prefabName;
             MyDefinitionManager.Static.GetBaseBlockPrefabName(MyCubeSize.Large, false, true, out prefabName);
-            MyObjectBuilder_CubeGrid[] gridBuilders = MyPrefabManager.Static.GetGridPrefab("bp");
+            MyObjectBuilder_CubeGrid[] gridBuilders = MyPrefabManager.Static.GetGridPrefab("Fighter");
             //MyDefinitionManager.Static.GetBaseBlockPrefabName(MyCubeSize.Large, false, true, out prefabName);
             //MyObjectBuilder_CubeGrid[] gridBuilders2 = MyPrefabManager.Static.GetGridPrefab(prefabName);
 
@@ -88,44 +103,26 @@ namespace Sandbox.Game.Bubbles
             MyEntities.Remove(MySession.LocalCharacter);
             re.AddEntityToBubble(MySession.LocalCharacter);
             MySession.LocalCharacter.EnableJetpack(true, false, true);
-            MySession.LocalCharacter.EnableDampeners(false, true);
-            //re.Physics.LinearVelocity = new Vector3(10, 0, 0);
+            //MySession.LocalCharacter.EnableDampeners(false, true);
 
             MyPhysics.Bubbles.Add(re);
         }
 
         public override void UpdateAfterSimulation()
         {
-            //calculate average position and velocity. posSum and velSum are accumulated in MyPhysics
-            Vector3D avgPos = posSum / (double)entities.Count;
-
-            Vector3D avgVel = velSum / (double)entities.Count;
-
-            //don't know if this is needed, it seems to be related to multithreading (which isn't being done)
-            m_internWorld.MarkForWrite();
-
-            //remove the average velocity from entities inside the bubble
-            //it seems like setting the position on the entity but not on its rigid body doesn't
-            //work (the entity moves but then clips back into its previous place), but doing the same with velocity does.
-            foreach (MyEntity ent in entities)
+            if (m_entities.Count == 0)
             {
-                ent.Physics.LinearVelocity -= avgVel;
+                Delete();
+                return;
+            } 
+            //MySession.LocalCharacter.Physics.SetLocalPosition(MySession.LocalCharacter.Physics.GetLocalMatrix().Translation + 0.1);
+            
+            List<MyEntity> toBeRemoved = new List<MyEntity>();
 
-                //apply position update to rigid bodies
-                if (ent.Physics.RigidBody != null)
-                {
-                    var rb = ent.Physics.RigidBody;
-                    rb.Position -= avgPos;
-                }
-                if (ent.Physics.CharacterProxy != null && ent.Physics.CharacterProxy.CharacterRigidBody != null)
-                {
-                    var rb = ent.Physics.CharacterProxy.CharacterRigidBody;
-                    rb.Position -= avgPos;
-                }
-            }
+            //calculate average position and velocity. posSum and velSum are accumulated in Entity's UpdateAfterSimulation
+            Vector3 avgPos = posSum / (double)m_entities.Count;
 
-            //see above for MarkForWrite
-            m_internWorld.UnmarkForWrite();
+            Vector3 avgVel = velSum / (double)m_entities.Count;
 
             // add the average position and velocity to the bubble itself
             Physics.LinearVelocity += avgVel;
@@ -133,19 +130,114 @@ namespace Sandbox.Game.Bubbles
             blmat.Translation += avgPos;
             PositionComp.WorldMatrix = blmat;
 
+            //remove the average velocity from entities inside the bubble
+            //it seems like setting the position on the entity but not on its rigid body doesn't
+            //work (the entity moves but then snaps back into its previous place), but doing the same with velocity does.
+            foreach (MyEntity ent in m_entities)
+            {
+                //don't know if this is needed, it seems to be related to multithreading (which isn't being done)
+                m_internWorld.UnmarkForWrite();
+
+                if (avgVel != Vector3.Zero)
+                    ent.Physics.LinearVelocity -= avgVel;
+
+                if (avgPos != Vector3.Zero)
+                {
+                    //apply position update to rigid bodies
+                    ent.Physics.SetLocalPosition(ent.Physics.GetLocalMatrix().Translation + Vector3.TransformNormal(ent.Physics.Center, ent.WorldMatrix) - avgPos);
+                    ent.Physics.OnLocalPositionChanged();
+                }
+
+                //see above for MarkForWrite
+                m_internWorld.MarkForWrite();
+
+                //check if entity can still be in bubble, and if not, find another bubble for it.
+                if (!CanStayInBubble(ent))
+                {
+                    toBeRemoved.Add(ent);
+                }
+                else
+                {
+
+                    //update Extents
+                    Vector3D max = new Vector3D();
+                    Vector3D min = new Vector3D();
+
+                    //maximum XYZ
+                    if (ent.PositionComp.GetPosition().X > max.X)
+                    {
+                        max.X = ent.PositionComp.GetPosition().X;
+                    }
+                    if (ent.PositionComp.GetPosition().Y > max.Y)
+                    {
+                        max.Y = ent.PositionComp.GetPosition().Y;
+                    }
+                    if (ent.PositionComp.GetPosition().Z > max.Z)
+                    {
+                        max.Z = ent.PositionComp.GetPosition().Z;
+                    }
+                    extents.Max = max;
+
+                    //minimum XYZ
+                    if (ent.PositionComp.GetPosition().X < min.X)
+                    {
+                        min.X = ent.PositionComp.GetPosition().X;
+                    }
+                    if (ent.PositionComp.GetPosition().Y < min.Y)
+                    {
+                        min.Y = ent.PositionComp.GetPosition().Y;
+                    }
+                    if (ent.PositionComp.GetPosition().Z < min.Z)
+                    {
+                        min.Z = ent.PositionComp.GetPosition().Z;
+                    }
+                    extents.Min = min;
+                }
+            }
+
             //reset the position and velocity sums
             ClearPositionsSum();
             ClearVelocitySum();
+
+            //remove the entities to be removed. this is done here because you can't change a collection during a foreach
+            foreach (MyEntity entity in toBeRemoved)
+            {
+                RemoveEntityAndCompensate(entity);
+                MyPhysics.AddEntityToBubble(entity);
+            }
+                      
         }
 
-        public void AddEntityToBubble(MyEntity entity)
+        public void AddEntityToBubble(MyEntity entity, bool insertToScene = true)
         {
             entity.Physics.Bubble = this;
             entity.Physics.InBubble = true;
-            entities.Add(entity);
-            entity.OnAddedToScene(null, m_internWorld);
+            if (insertToScene)
+            {
+                m_entities.Add(entity);
+                entity.OnAddedToScene(null, m_internWorld);
+            }
+        }
 
-            //MTODO: add location and velocity conversions
+        public void AddEntityAndCompensate(MyEntity entity, bool insertToScene = true)
+        {
+            AddEntityToBubble(entity, insertToScene);
+            entity.Physics.SetLocalPosition(entity.Physics.GetWorldMatrix().Translation - this.PositionComp.GetPosition());
+            entity.Physics.LinearVelocity -= this.Physics.LinearVelocity;
+        }
+
+        public void RemoveEntityFromBubble(MyEntity entity)
+        {
+            m_entities.Remove(entity);
+            entity.Physics.Bubble = null;
+            entity.OnRemovedFromScene(null, m_internWorld);
+        }
+
+        public void RemoveEntityAndCompensate(MyEntity entity)
+        {
+            RemoveEntityFromBubble(entity);
+            entity.Physics.SetLocalPosition(entity.Physics.GetWorldMatrix().Translation + this.PositionComp.GetPosition());
+            entity.Physics.LinearVelocity += this.Physics.LinearVelocity;
         }
 
         public void AddToVelocitySum(Vector3D amount)
@@ -166,6 +258,31 @@ namespace Sandbox.Game.Bubbles
         public void ClearPositionsSum()
         {
             this.posSum = Vector3D.Zero;
+        }
+
+        public bool CanStayInBubble(MyEntity entity)
+        {
+            if (entity.Physics.GetLocalMatrix().Translation.AbsMax() > 100)
+                return false;
+            if (entity.Physics.LinearVelocity.AbsMax() > 100)
+                return false;
+            return true;
+        }
+
+        public bool CanBeInBubble(MyEntity entity)
+        {
+            if ((entity.Physics.GetWorldMatrix().Translation - this.PositionComp.GetPosition()).AbsMax() > 100)
+                return false;
+            if ((entity.Physics.LinearVelocity - this.Physics.LinearVelocity).AbsMax() > 100)
+                return false;
+            return true;
+        }
+
+        public override void Delete()
+        {
+            this.MarkedForClose = true;
+            base.Delete();
+            MyPhysics.Bubbles.Remove(this);
         }
     }
 }

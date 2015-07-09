@@ -4235,7 +4235,7 @@
       <Loopable>true</Loopable>
       <Waves>
         <Wave Type="D2">
-          <Loop>ARC\BLOCK\BlockCockpitSmLoop2d.wav</Loop>
+          <Loop>ARC\BLOCK\ArcBlockCockpitSmLoop2d.xwm</Loop>
         </Wave>
         <!--<Wave Type="D3">
           <Loop>ARC\BLOCK\ArcBlockCockpitLrgLoop3d.xwm</Loop>
@@ -4253,7 +4253,7 @@
       <Loopable>true</Loopable>
       <Waves>
         <Wave Type="D2">
-          <Loop>ARC\BLOCK\BlockCockpitSmLoop2d.wav</Loop>
+          <Loop>ARC\BLOCK\ArcBlockCockpitSmLoop2d.xwm</Loop>
         </Wave>
         <!--<Wave Type="D3">
           <Loop>ARC\BLOCK\ArcBlockCockpitSmLoop3d.xwm</Loop>
