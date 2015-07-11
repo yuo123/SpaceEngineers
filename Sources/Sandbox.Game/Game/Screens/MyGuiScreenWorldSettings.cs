@@ -491,9 +491,9 @@ namespace Sandbox.Game.Gui
             m_scenarioTypesGroup.SelectByKey(0);
             m_settings = GetDefaultSettings();
             m_settings.EnableToolShake = true;
-            m_settings.EnablePlanets = MyFakes.ENABLE_PLANETS;
-            m_settings.EnableStationVoxelSupport = true;
-            m_settings.EnableSunRotation = true;
+            m_settings.EnablePlanets = (MyPerGameSettings.Game == GameEnum.SE_GAME) && MyFakes.ENABLE_PLANETS;
+            m_settings.EnableStationVoxelSupport = MyPerGameSettings.Game == GameEnum.SE_GAME;
+            m_settings.EnableSunRotation = MyPerGameSettings.Game == GameEnum.SE_GAME;
             m_settings.VoxelGeneratorVersion = MyVoxelConstants.VOXEL_GENERATOR_VERSION;
             m_settings.EnableOxygen = true;
             m_mods = new List<MyObjectBuilder_Checkpoint.ModItem>();
@@ -602,7 +602,7 @@ namespace Sandbox.Game.Gui
                 {
                     m_enablePlanets.IsChecked = true;
                     m_enablePlanets.Enabled = true;
-                }
+            }
 
                 if (m_floraDensityCombo != null)
                 {
@@ -618,7 +618,7 @@ namespace Sandbox.Game.Gui
                 {
                     m_enablePlanets.IsChecked = false;
                     m_enablePlanets.Enabled = false;
-                }
+            }
 
                 if (m_floraDensityLabel != null)
                 {
@@ -749,7 +749,7 @@ namespace Sandbox.Game.Gui
         protected virtual void GetSettingsFromControls()
         {
             m_settings.OnlineMode = (MyOnlineModeEnum)m_onlineMode.GetSelectedKey();
-            if (m_checkpoint != null)           
+            if (m_checkpoint != null)
                 m_checkpoint.PreviousEnvironmentHostility = m_settings.EnvironmentHostility;
             m_settings.EnvironmentHostility = (MyEnvironmentHostilityEnum)m_environment.GetSelectedKey();
             m_settings.MaxPlayers = (short)m_maxPlayersSlider.Value;
@@ -757,7 +757,7 @@ namespace Sandbox.Game.Gui
             m_settings.GameMode   = GetGameMode();
             m_settings.ScenarioEditMode = m_scenarioEditMode.IsChecked;
             
-            if (m_isNewGame)
+            if (m_isNewGame && MyFakes.ENABLE_PLANETS)
             {
                 m_settings.EnablePlanets = m_enablePlanets.IsChecked;
                 m_settings.FloraDensity = GetFloraDensity();
@@ -775,7 +775,7 @@ namespace Sandbox.Game.Gui
 
             UpdateSurvivalState(m_settings.GameMode == MyGameModeEnum.Survival);
             m_scenarioEditMode.IsChecked = m_settings.ScenarioEditMode;
-            if (m_isNewGame)
+            if (m_isNewGame && MyFakes.ENABLE_PLANETS)
             {
                 m_enablePlanets.IsChecked = m_settings.EnablePlanets;
                 m_floraDensityCombo.SelectItemByKey((int)FloraDensityEnumKey(m_settings.FloraDensity));

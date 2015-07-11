@@ -131,7 +131,10 @@ namespace Sandbox.Game.Entities.Character
     [MyEntityType(typeof(MyObjectBuilder_Character))]
     public partial class MyCharacter :
         MySkinnedEntity,
+<<<<<<< HEAD
         IMyComponentOwner<MyComponentInventoryAggregate>,
+=======
+>>>>>>> KSH/master
         IMyCameraController,
         IMyControllableEntity,
         IMyInventoryOwner,
@@ -246,7 +249,6 @@ namespace Sandbox.Game.Entities.Character
         Vector3 m_currentScatterPos;
         Vector3 m_lastScatterPos;
 
-
         //ulong m_actualUpdateFrame = 0;
         //ulong m_actualDrawFrame = 0;
         //ulong m_transformedBonesFrame = 0;
@@ -261,7 +263,10 @@ namespace Sandbox.Game.Entities.Character
         CapsuleD[] m_bodyCapsules = new CapsuleD[1];//new CapsuleD[10];
         MatrixD m_headMatrix = MatrixD.CreateTranslation(0, 1.65, 0);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> KSH/master
         MyHudNotification m_pickupObjectNotification;
         MyHudNotification m_inertiaDampenersNotification;
         MyHudNotification m_broadcastingNotification;
@@ -284,7 +289,10 @@ namespace Sandbox.Game.Entities.Character
         MyInventory m_inventory;
         MyBattery m_suitBattery;
         MyPowerDistributor m_suitPowerDistributor;
+<<<<<<< HEAD
         List<MyPhysicalInventoryItem> m_inventoryResults = new List<MyPhysicalInventoryItem>();
+=======
+>>>>>>> KSH/master
 
         bool m_dampenersEnabled = true;
         bool m_jetpackEnabled = false;
@@ -561,6 +569,7 @@ namespace Sandbox.Game.Entities.Character
 
         public event Action<MyCharacter> CharacterDied;
 
+<<<<<<< HEAD
         private MyComponentInventoryAggregate m_inventoryAggregate;
         public MyComponentInventoryAggregate InventoryAggregate
         {
@@ -579,6 +588,22 @@ namespace Sandbox.Game.Entities.Character
                     Components.Remove<MyComponentInventoryAggregate>();
                 }
                 m_inventoryAggregate = value;
+=======
+        public MyInventoryAggregate InventoryAggregate
+        {
+            get
+            {
+                var aggregate = Components.Get<MyInventoryBase>() as MyInventoryAggregate;
+                return aggregate;
+            }
+            set 
+            {
+                if (Components.Has<MyInventoryBase>())
+                {
+                    Components.Remove<MyInventoryBase>();
+                }
+                Components.Add<MyInventoryBase>(value);
+>>>>>>> KSH/master
             }
         }
 
@@ -659,6 +684,7 @@ namespace Sandbox.Game.Entities.Character
             this.Render = new MyRenderComponentCharacter();
             StatComp = new MyCharacterStatComponent();
 
+<<<<<<< HEAD
             // TODO: When this Inventory system is working well, remove it and use it as default for SE too
             if (MyFakes.ENABLE_MEDIEVAL_INVENTORY)
             {
@@ -668,6 +694,16 @@ namespace Sandbox.Game.Entities.Character
             AddDebugRenderComponent(new MyDebugRenderComponentCharacter(this));
 
             Components.Add<MyCharacterDetectorComponent>(new MyCharacterRaycastDetectorComponent());
+=======
+            AddDebugRenderComponent(new MyDebugRenderComponentCharacter(this));
+
+            if (MyPerGameSettings.CharacterDetectionComponent != null)
+                Components.Add<MyCharacterDetectorComponent>((MyCharacterDetectorComponent)Activator.CreateInstance(MyPerGameSettings.CharacterDetectionComponent));
+            else
+                Components.Add<MyCharacterDetectorComponent>(new MyCharacterRaycastDetectorComponent());
+
+            //Components.Add<MyCharacterDetectorComponent>(new MyCharacterShapecastDetectorComponent());
+>>>>>>> KSH/master
         }
 
         /// <summary>
@@ -764,6 +800,7 @@ namespace Sandbox.Game.Entities.Character
                 SwitchAnimation(MyCharacterMovementEnum.Died, false);
             }
 
+<<<<<<< HEAD
             InventoryVolume = m_characterDefinition.InventoryVolume;
             InventoryMass = m_characterDefinition.InventoryMass;
             InventorySize = new Vector3(m_characterDefinition.InventorySizeX, m_characterDefinition.InventorySizeY, m_characterDefinition.InventorySizeZ);
@@ -771,6 +808,9 @@ namespace Sandbox.Game.Entities.Character
             m_inventory.Init(characterOb.Inventory);
             m_inventory.ContentsChanged += inventory_OnContentsChanged;
             m_inventory.ContentsChanged += MyToolbarComponent.CurrentToolbar.CharacterInventory_OnContentsChanged;
+=======
+            InitInventory(characterOb);
+>>>>>>> KSH/master
 
             Physics.Enabled = true;
 
@@ -831,7 +871,11 @@ namespace Sandbox.Game.Entities.Character
             if (m_stats != null)
             {
                 MyStatsDefinition statsDefinition = null;
+<<<<<<< HEAD
                 if (MyDefinitionManager.Static.TryGetDefinition(new MyDefinitionId(typeof(MyObjectBuilder_StatsDefinition), Definition.Stats), out statsDefinition))
+=======
+				if(MyDefinitionManager.Static.TryGetDefinition(new MyDefinitionId(typeof(MyObjectBuilder_StatsDefinition), Definition.Stats), out statsDefinition))
+>>>>>>> KSH/master
                     m_stats.InitStats(statsDefinition);
             }
 
@@ -885,6 +929,44 @@ namespace Sandbox.Game.Entities.Character
             InitSounds();
 
             if (InventoryAggregate != null) InventoryAggregate.Init();
+<<<<<<< HEAD
+=======
+        }
+
+        private void InitInventory(MyObjectBuilder_Character characterOb)
+        {
+            bool inventoryAlreadyExists = false;
+
+            if (MyPerGameSettings.ComponentSaving && MyFakes.ENABLE_MEDIEVAL_INVENTORY && InventoryAggregate != null)
+            {
+                foreach (var comp in InventoryAggregate.ChildList.Reader)
+                {
+                    if (comp.GetType() == typeof(MyInventory))
+                    {
+                        inventoryAlreadyExists = true;
+                        m_inventory = comp as MyInventory;
+                        m_inventory.Owner = this;
+                        break;
+                    }
+                }
+            }
+
+            if (!inventoryAlreadyExists)
+            {
+                InventoryVolume = m_characterDefinition.InventoryVolume;
+                InventoryMass = m_characterDefinition.InventoryMass;
+                InventorySize = new Vector3(m_characterDefinition.InventorySizeX, m_characterDefinition.InventorySizeY, m_characterDefinition.InventorySizeZ);
+                m_inventory = new MyInventory(InventoryVolume, InventoryMass, InventorySize, 0, this);
+                m_inventory.Init(characterOb.Inventory);
+                m_inventory.ContentsChanged += inventory_OnContentsChanged;
+                m_inventory.ContentsChanged += MyToolbarComponent.CurrentToolbar.CharacterInventory_OnContentsChanged;
+                MyCubeBuilder.BuildComponent.AfterCharacterCreate(this);
+                if (MyFakes.ENABLE_MEDIEVAL_INVENTORY && InventoryAggregate != null)
+                {
+                    InventoryAggregate.AddComponent(m_inventory);
+                }
+            }
+>>>>>>> KSH/master
         }
 
         private void InitSounds()
@@ -1021,11 +1103,16 @@ namespace Sandbox.Game.Entities.Character
             }
         }
 
-        void inventory_OnContentsChanged(MyInventory inventory)
+        void inventory_OnContentsChanged(MyInventoryBase inventory)
         {
             // Switch away from the weapon if we don't have it; Cube placer is an exception
+<<<<<<< HEAD
             if (m_currentWeapon != null && m_currentWeapon.DefinitionId.TypeId != typeof(MyObjectBuilder_CubePlacer)
                 && inventory != null && !inventory.ContainItems(1, m_currentWeapon.PhysicalObject))
+=======
+            if (m_currentWeapon != null && WeaponTakesBuilderFromInventory(m_currentWeapon.DefinitionId)
+                && inventory != null && inventory is MyInventory && !(inventory as MyInventory).ContainItems(1, m_currentWeapon.PhysicalObject))
+>>>>>>> KSH/master
                 SwitchToWeapon(null);
         }
 
@@ -1393,6 +1480,8 @@ namespace Sandbox.Game.Entities.Character
 
             objectBuilder.CharacterModel = m_characterModel;
             objectBuilder.ColorMaskHSV = ColorMask;
+
+            if (!MyPerGameSettings.ComponentSaving)
             objectBuilder.Inventory = m_inventory.GetObjectBuilder();
 
             if (m_currentWeapon != null)
@@ -2590,6 +2679,15 @@ namespace Sandbox.Game.Entities.Character
                     {
                         Physics.CharacterProxy.LinearVelocity = Vector3.Zero;
                     }
+<<<<<<< HEAD
+=======
+
+                    // On planets limit the jetpack strength
+                    if (MyFakes.ENABLE_PLANETS_JETPACK_LIMIT)
+                    {
+                        LimitJetpackVelocity();
+                    }
+>>>>>>> KSH/master
                 }
                 //Solve Y orientation and gravity only in non flying mode
                 else if (!IsDead)
@@ -3168,8 +3266,7 @@ namespace Sandbox.Game.Entities.Character
                     }
                 }
             }
-            else
-                if (Physics.CharacterProxy != null)
+            else if (Physics.CharacterProxy != null)
                 {
                     Physics.CharacterProxy.Elevate = 0;
                 }
@@ -3201,7 +3298,6 @@ namespace Sandbox.Game.Entities.Character
                     Physics.CharacterProxy.Forward = characterMatrix.Forward;
                     Physics.CharacterProxy.Up = characterMatrix.Up;
                 }
-
 
                 const float ANGLE_FOR_ROTATION_ANIMATION = 20;
 
@@ -3247,6 +3343,7 @@ namespace Sandbox.Game.Entities.Character
                         m_currentRotationDelay = 0.0f;
                     }
                 }
+            }
 
                 if (rotationIndicator.X != 0)
                 {
@@ -3268,8 +3365,7 @@ namespace Sandbox.Game.Entities.Character
                             }
                         }
                     }
-                    else
-                        if (canRotate)
+                else if (canRotate)
                         {
                             MatrixD rotationMatrix = WorldMatrix.GetOrientation();
                             Vector3D translation = WorldMatrix.Translation + WorldMatrix.Up;
@@ -3293,7 +3389,6 @@ namespace Sandbox.Game.Entities.Character
                             }
                         }
                 }
-            }
 
             if (roll != 0)
             {
@@ -3451,7 +3546,11 @@ namespace Sandbox.Game.Entities.Character
 
                 m_previousMovementState = m_currentMovementState;
                 m_currentMovementState = state;
+<<<<<<< HEAD
                 if (OnMovementStateChanged != null)
+=======
+				if(OnMovementStateChanged != null)
+>>>>>>> KSH/master
                     OnMovementStateChanged(m_previousMovementState, m_currentMovementState);
 
                 if (updateSync && SyncObject != null)
@@ -4861,7 +4960,11 @@ namespace Sandbox.Game.Entities.Character
                     gunEntity.EntityId = 0;
                 }
                 var handToolGun = gunEntity as MyObjectBuilder_HandTool;
+<<<<<<< HEAD
                 if (handToolGun != null)
+=======
+				if(handToolGun != null)
+>>>>>>> KSH/master
                 {
                     handToolGun.IsDeconstructor = weapon.IsDeconstructor;
                     SwitchToWeaponInternal(weaponDefinition, sync, true, handToolGun, 0);
@@ -4913,7 +5016,6 @@ namespace Sandbox.Game.Entities.Character
                         weaponEntityBuilder = gun.PhysicalObject.GunEntity;
                         EquipWeapon(gun);
                     }
-                    m_inventoryResults.Clear();
                 }
                 else
                 {
@@ -5107,17 +5209,30 @@ namespace Sandbox.Game.Entities.Character
             }
         }
 
+<<<<<<< HEAD
         public MyGuiScreenBase ShowAggregateInventoryScreen()
+=======
+        public MyGuiScreenBase ShowAggregateInventoryScreen(MyInventoryBase rightSelectedInventory = null)
+>>>>>>> KSH/master
         {
             MyGuiScreenBase screen = null;
             if (MyPerGameSettings.GUI.InventoryScreen != null)
             {
+<<<<<<< HEAD
                 var aggregateComponent = Components.Get<MyComponentInventoryAggregate>();
                 if (aggregateComponent != null)
                 {
                     aggregateComponent.Init();
                     screen = MyGuiSandbox.CreateScreen(MyPerGameSettings.GUI.InventoryScreen, aggregateComponent);
                     MyGuiSandbox.AddScreen(screen);
+=======
+                if (InventoryAggregate != null)
+                {
+                    InventoryAggregate.Init();
+                    screen = MyGuiSandbox.CreateScreen(MyPerGameSettings.GUI.InventoryScreen, InventoryAggregate, rightSelectedInventory);
+                    MyGuiSandbox.AddScreen( screen );
+                    screen.Closed += (scr) => { InventoryAggregate.DetachCallbacks(); };
+>>>>>>> KSH/master
                 }
             }
             return screen;
@@ -5712,7 +5827,11 @@ namespace Sandbox.Game.Entities.Character
             Debug.Assert(blockDefinition.Components.Length != 0, "Missing components!");
 
             var inventory = MyCubeBuilder.BuildComponent.GetBuilderInventory(this);
+<<<<<<< HEAD
             if (inventory == null)
+=======
+			if(inventory == null)
+>>>>>>> KSH/master
                 return false;
 
             return (inventory.GetItemAmount(blockDefinition.Components[0].Definition.Id) >= 1);
@@ -7453,6 +7572,7 @@ namespace Sandbox.Game.Entities.Character
             }
             if (MyPerGameSettings.GUI.InventoryScreen != null && IsDead)
             {
+<<<<<<< HEAD
                 // TODO: This should just open the screen of the character and not adding the the aggregate itself..
                 var otherAggregate = user.Components.Get<MyComponentInventoryAggregate>();
                 var aggregate = Components.Get<MyComponentInventoryAggregate>();
@@ -7460,6 +7580,10 @@ namespace Sandbox.Game.Entities.Character
                 var screen = user.ShowAggregateInventoryScreen();
                 screen.Closed += delegate(MyGuiScreenBase source) { otherAggregate.RemoveChild(aggregate); };
 
+=======
+                var inventory = Components.Get<MyInventoryAggregate>();
+                var screen = user.ShowAggregateInventoryScreen(inventory);               
+>>>>>>> KSH/master
             }
         }
 
@@ -7965,6 +8089,7 @@ namespace Sandbox.Game.Entities.Character
         //{
         //    return UseObject is T;
         //}
+<<<<<<< HEAD
 
         public MyEntity ManipulatedEntity;
 
@@ -7972,6 +8097,19 @@ namespace Sandbox.Game.Entities.Character
         {
             component = m_inventoryAggregate;
             return m_inventoryAggregate != null;
+=======
+
+        public MyEntity ManipulatedEntity;
+
+        private void LimitJetpackVelocity()
+        {
+            var planetGravity = MyGravityProviderSystem.CalculateGravityInPoint(PositionComp.WorldAABB.Center);           
+           
+            if (planetGravity != Vector3.Zero)
+            {
+                Physics.CharacterProxy.Gravity = planetGravity * CHARACTER_GRAVITY_MULTIPLIER;                
+            }
+>>>>>>> KSH/master
         }
     }
 }

@@ -161,10 +161,10 @@ namespace Sandbox.Game.Entities
             {
                 HkConvexTransformShape transform = new HkConvexTransformShape((HkConvexShape)shape, ref scaleMatrix, HkReferencePolicy.None);
         
-                Physics.CreateFromCollisionObject(transform, Vector3.Zero, MatrixD.Identity, massProperties, MyPhysics.FloatingObjectCollisionLayer);
-               
-                Physics.Enabled = true;
-                transform.Base.RemoveReference();
+            Physics.CreateFromCollisionObject(transform, Vector3.Zero, MatrixD.Identity, massProperties, MyPhysics.FloatingObjectCollisionLayer);
+
+            Physics.Enabled = true;
+            transform.Base.RemoveReference();
             }
             else
             {
@@ -283,15 +283,8 @@ namespace Sandbox.Game.Entities
                 if (MySession.ControlledEntity == user)
                     MyAudio.Static.PlaySound(TAKE_ITEM_SOUND.SoundId);
                 //user.StartSecondarySound(TAKE_ITEM_SOUND);
-                // MW:TODO HACK - remove after floating object is component OR when we have accessible inventories in ME
-                if (Item.Content.TypeId == typeof(MyObjectBuilder_ConsumableItem))
-                {
-                    var consumableDefinition = MyDefinitionManager.Static.GetDefinition(Item.Content.GetId()) as MyConsumableItemDefinition;
-                    user.StatComp.Consume(Item.Amount, consumableDefinition);
-                    MyFloatingObjects.RemoveFloatingObject(this);
-                }
-                else
-                    user.GetInventory().TakeFloatingObject(this);
+
+                user.GetInventory().TakeFloatingObject(this);
                 MyHud.Notifications.ReloadTexts();
             }
         }

@@ -235,7 +235,9 @@
     <None Include="Content\Data\Prefabs\Trade2.sbc" />
     <None Include="Content\Data\Prefabs\Trade3.sbc" />
     <None Include="Content\Data\RespawnShips.sbc" />
-    <None Include="Content\Data\Scenarios.sbx" />
+    <None Include="Content\Data\Scenarios.sbx">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Content\Data\Screens\CubeBuilder.gsc" />
     <None Include="Content\Data\Screens\CubeBuilderBar.gsc" />
     <None Include="Content\Data\Screens\DialogAmount.gsc" />
@@ -364,8 +366,4 @@
     <Copy Condition="'$(Configuration)|$(Platform)' == 'Release Official|x86'" SourceFiles="@(Redists86)" DestinationFolder="$(OutDir)" />
     <Copy Condition="'$(Configuration)|$(Platform)' == 'Release Official|x64'" SourceFiles="@(Redists64)" DestinationFolder="$(OutDir)" />
   </Target>
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
 </Project>

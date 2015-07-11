@@ -256,21 +256,21 @@ namespace Sandbox.Game.Gui
                 {
                     if (!MyFakes.ENABLE_BATTLE_SYSTEM || !MySession.Static.Battle || Sync.IsServer)
                     {
-                        if (MySession.GetCameraControllerEnum() != MyCameraControllerEnum.Spectator)
-                        {
-                            MySession.SetCameraController(MyCameraControllerEnum.Spectator);
-                        }
-                        else if (MyInput.Static.IsAnyShiftKeyPressed())
-                        {
-                            MyFakes.ENABLE_DEVELOPER_SPECTATOR_CONTROLS = !MyFakes.ENABLE_DEVELOPER_SPECTATOR_CONTROLS;
-                        }
-
-                        if (MyInput.Static.IsAnyCtrlKeyPressed() && MySession.ControlledEntity != null)
-                        {
-                            MySpectator.Static.Position = (Vector3D)MySession.ControlledEntity.Entity.PositionComp.GetPosition() + MySpectator.Static.ThirdPersonCameraDelta;
-                            MySpectator.Static.Target = (Vector3D)MySession.ControlledEntity.Entity.PositionComp.GetPosition();
-                        }
+                    if (MySession.GetCameraControllerEnum() != MyCameraControllerEnum.Spectator)
+                    {
+                        MySession.SetCameraController(MyCameraControllerEnum.Spectator);
                     }
+                    else if (MyInput.Static.IsAnyShiftKeyPressed())
+                    {
+                        MyFakes.ENABLE_DEVELOPER_SPECTATOR_CONTROLS = !MyFakes.ENABLE_DEVELOPER_SPECTATOR_CONTROLS;
+                    }
+
+                    if (MyInput.Static.IsAnyCtrlKeyPressed() && MySession.ControlledEntity != null)
+                    {
+                        MySpectator.Static.Position = (Vector3D)MySession.ControlledEntity.Entity.PositionComp.GetPosition() + MySpectator.Static.ThirdPersonCameraDelta;
+                        MySpectator.Static.Target = (Vector3D)MySession.ControlledEntity.Entity.PositionComp.GetPosition();
+                    }
+                }
                 }
 
                 //Set camera to static spectator, non movable
@@ -532,7 +532,9 @@ namespace Sandbox.Game.Gui
                     {
                         MyVoiceChatSessionComponent.Static.StartRecording();
                     }
-                    else if (MyControllerHelper.IsControl(context, MyControlsSpace.VOICE_CHAT, MyControlStateType.NEW_RELEASED))
+                    //else if (MyControllerHelper.IsControl(context, MyControlsSpace.VOICE_CHAT, MyControlStateType.NEW_RELEASED))
+                    // TODO: If other key was pressed during VOIP, NEW_RELEASED will return false even if this key was pressed, is this correct? We don't store key states?
+                    else if (MyVoiceChatSessionComponent.Static.IsRecording && !MyControllerHelper.IsControl(context, MyControlsSpace.VOICE_CHAT, MyControlStateType.PRESSED))
                     {
                         MyVoiceChatSessionComponent.Static.StopRecording();
                     }
@@ -546,42 +548,42 @@ namespace Sandbox.Game.Gui
             {
                 if (!MySession.Static.IsScenario)
                 {
-                    MyGuiAudio.PlaySound(MyGuiSounds.HudMouseClick);
-                    var currentSession = MySession.Static.CurrentPath;
+                MyGuiAudio.PlaySound(MyGuiSounds.HudMouseClick);
+                var currentSession = MySession.Static.CurrentPath;
 
-                    if (MyInput.Static.IsAnyShiftKeyPressed())
+                if (MyInput.Static.IsAnyShiftKeyPressed())
+                {
+                    if (MySession.Static.ClientCanSave || Sync.IsServer)
                     {
-                        if (MySession.Static.ClientCanSave || Sync.IsServer)
+                        if (!MyAsyncSaving.InProgress)
                         {
-                            if (!MyAsyncSaving.InProgress)
-                            {
-                                var messageBox = MyGuiSandbox.CreateMessageBox(
-                                    buttonType: MyMessageBoxButtonsType.YES_NO,
-                                    messageText: MyTexts.Get(MySpaceTexts.MessageBoxTextAreYouSureYouWantToQuickSave),
-                                    messageCaption: MyTexts.Get(MySpaceTexts.MessageBoxCaptionPleaseConfirm),
-                                    callback: delegate(MyGuiScreenMessageBox.ResultEnum callbackReturn)
-                                    {
-                                        if (callbackReturn == MyGuiScreenMessageBox.ResultEnum.YES)
-                                            MyAsyncSaving.Start(() => MySector.ResetEyeAdaptation = true);//black screen after save
-                                    });
-                                messageBox.SkipTransition = true;
-                                messageBox.CloseBeforeCallback = true;
-                                MyGuiSandbox.AddScreen(messageBox);
-                            }
+                            var messageBox = MyGuiSandbox.CreateMessageBox(
+                                buttonType: MyMessageBoxButtonsType.YES_NO,
+                                messageText: MyTexts.Get(MySpaceTexts.MessageBoxTextAreYouSureYouWantToQuickSave),
+                                messageCaption: MyTexts.Get(MySpaceTexts.MessageBoxCaptionPleaseConfirm),
+                                callback: delegate(MyGuiScreenMessageBox.ResultEnum callbackReturn)
+                                {
+                                    if (callbackReturn == MyGuiScreenMessageBox.ResultEnum.YES)
+                                        MyAsyncSaving.Start(() => MySector.ResetEyeAdaptation = true);//black screen after save
+                                });
+                            messageBox.SkipTransition = true;
+                            messageBox.CloseBeforeCallback = true;
+                            MyGuiSandbox.AddScreen(messageBox);
                         }
-                        else
-                            MyHud.Notifications.Add(MyNotificationSingletons.ClientCannotSave);
-                    }
-                    else if (Sync.IsServer)
-                    {
-                        ShowLoadMessageBox(currentSession);
                     }
                     else
-                    {
-                        // Is multiplayer client, reconnect
-                        ShowReconnectMessageBox();
-                    }
+                        MyHud.Notifications.Add(MyNotificationSingletons.ClientCannotSave);
                 }
+                else if (Sync.IsServer)
+                {
+                    ShowLoadMessageBox(currentSession);
+                }
+                else
+                {
+                    // Is multiplayer client, reconnect
+                    ShowReconnectMessageBox();
+                }
+            }
             }
 
             //  Launch main menu
@@ -701,7 +703,7 @@ namespace Sandbox.Game.Gui
 
                     if (!MyInput.Static.IsGameControlPressed(MyControlsSpace.LOOKAROUND))
                     {
-                        MySession.ControlledEntity.MoveAndRotate(moveIndicator, rotationIndicator, rollIndicator);
+                        MySession.ControlledEntity.MoveAndRotate(moveIndicator, rotationIndicator, rollIndicator);                   
                     }
                     else
                     {
@@ -942,12 +944,25 @@ namespace Sandbox.Game.Gui
                 MyPostProcessVolumetricSSAO2.Contrast
             );
 
-            Vector3 sunDirection = -MySector.DirectionToSunNormalized;
+            Vector3 sunDirection = -MySector.SunProperties.SunDirectionNormalized;
             if (MySession.Static.Settings.EnableSunRotation)
             {
-                double angle = 2.0*MathHelper.Pi * MySession.Static.ElapsedGameTime.TotalMinutes / MySession.Static.Settings.SunRotationIntervalMinutes;
-                sunDirection += new Vector3(Math.Cos(angle),0, Math.Sin(angle));
+                float angle = 2.0f * MathHelper.Pi * (float)(MySession.Static.ElapsedGameTime.TotalMinutes / MySession.Static.Settings.SunRotationIntervalMinutes);
+                float originalSunCosAngle = Math.Abs(Vector3.Dot(sunDirection, Vector3.Up));
+                Vector3 sunRotationAxis;
+                if (originalSunCosAngle > 0.95f)
+                {
+                    // original sun is too close to the poles
+                    sunRotationAxis = Vector3.Cross(Vector3.Cross(sunDirection, Vector3.Left), sunDirection);
+                }
+                else
+                {
+                    sunRotationAxis = Vector3.Cross(Vector3.Cross(sunDirection, Vector3.Up), sunDirection);
+                }
+                sunDirection = Vector3.Transform(sunDirection, Matrix.CreateFromAxisAngle(sunRotationAxis, angle));
                 sunDirection.Normalize();
+
+                MySector.DirectionToSunNormalized = -sunDirection;
             }
 
             VRageRender.MyRenderProxy.UpdateRenderEnvironment(

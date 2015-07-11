@@ -428,9 +428,9 @@ namespace Sandbox.Game.Screens.Helpers
         {
             if (!m_items.IsValidIndex(i))
                 return;
-
+            
 			var definitionItem = item as MyToolbarItemDefinition;
-			if (definitionItem != null && !definitionItem.Definition.AvailableInSurvival && MySession.Static.SurvivalMode)
+			if (definitionItem != null && definitionItem.Definition != null && !definitionItem.Definition.AvailableInSurvival && MySession.Static.SurvivalMode)
 				return;
             
             if (item != null && !item.AllowedInToolbarType(m_toolbarType))
@@ -507,7 +507,7 @@ namespace Sandbox.Game.Screens.Helpers
                 ItemEnabledChanged(this, new SlotArgs() { SlotNumber = slotIndex });
         }
 
-        public void CharacterInventory_OnContentsChanged(MyInventory inventory)
+        public void CharacterInventory_OnContentsChanged(MyInventoryBase inventory)
         {
             Update();
         }
@@ -560,7 +560,7 @@ namespace Sandbox.Game.Screens.Helpers
                 {
                     if (playActivationSound)
                     {
-                        MyGuiAudio.PlaySound(MyGuiSounds.HudClick);
+                    MyGuiAudio.PlaySound(MyGuiSounds.HudClick);
                     }
                     if (SlotActivated != null)
                         SlotActivated(this, new SlotArgs { SlotNumber = slot });

@@ -3792,6 +3792,7 @@
       </Id>
       <Category>BLOCK_PROGRESS</Category>
       <MaxDistance>20</MaxDistance>
+      <Volume>0.7</Volume>
       <Loopable>true</Loopable>
       <Waves>
         <Wave Type="D3">
@@ -4235,7 +4236,7 @@
       <Loopable>true</Loopable>
       <Waves>
         <Wave Type="D2">
-          <Loop>ARC\BLOCK\ArcBlockCockpitSmLoop2d.xwm</Loop>
+          <Loop>ARC\BLOCK\BlockCockpitSmLoop2d.wav</Loop>
         </Wave>
         <!--<Wave Type="D3">
           <Loop>ARC\BLOCK\ArcBlockCockpitLrgLoop3d.xwm</Loop>
@@ -4253,7 +4254,7 @@
       <Loopable>true</Loopable>
       <Waves>
         <Wave Type="D2">
-          <Loop>ARC\BLOCK\ArcBlockCockpitSmLoop2d.xwm</Loop>
+          <Loop>ARC\BLOCK\BlockCockpitSmLoop2d.wav</Loop>
         </Wave>
         <!--<Wave Type="D3">
           <Loop>ARC\BLOCK\ArcBlockCockpitSmLoop3d.xwm</Loop>
@@ -4805,7 +4806,7 @@
         </Wave>
       </Waves>
     </Sound>
-        <Sound>
+    <Sound>
       <Id>
         <TypeId>MyObjectBuilder_AudioDefinition</TypeId>
         <SubtypeId>ArcPlayHelmetD</SubtypeId>
@@ -5223,6 +5224,58 @@
       <Waves>
         <Wave Type="D2">
           <Start>ARC\HUD\HudOxyNone2d.wav</Start>
+        </Wave>
+      </Waves>
+    </Sound>
+    <Sound>
+      <Id>
+        <TypeId>MyObjectBuilder_AudioDefinition</TypeId>
+        <SubtypeId>ArcBlockCollect</SubtypeId>
+      </Id>
+      <Category>BLOCK</Category>
+      <Volume>0.7</Volume>
+      <Waves>
+        <Wave Type="D3">
+          <Start>ARC\BLOCK\ArcBlockCollect3d01.wav</Start>
+        </Wave>
+      </Waves>
+    </Sound>
+    <Sound>
+      <Id>
+        <TypeId>MyObjectBuilder_AudioDefinition</TypeId>
+        <SubtypeId>ArcBlockEject</SubtypeId>
+      </Id>
+      <Category>BLOCK</Category>
+      <Volume>0.7</Volume>
+      <Waves>
+        <Wave Type="D3">
+          <Start>ARC\BLOCK\ArcBlockEject3d01.wav</Start>
+        </Wave>
+      </Waves>
+    </Sound>
+    <Sound>
+      <Id>
+        <TypeId>MyObjectBuilder_AudioDefinition</TypeId>
+        <SubtypeId>RealBlockCollect</SubtypeId>
+      </Id>
+      <Category>BLOCK</Category>
+      <Volume>0.7</Volume>
+      <Waves>
+        <Wave Type="D3">
+          <Start>REAL\BLOCK\RealBlockCollect3d01.wav</Start>
+        </Wave>
+      </Waves>
+    </Sound>
+    <Sound>
+      <Id>
+        <TypeId>MyObjectBuilder_AudioDefinition</TypeId>
+        <SubtypeId>RealBlockEject</SubtypeId>
+      </Id>
+      <Category>BLOCK</Category>
+      <Volume>0.7</Volume>
+      <Waves>
+        <Wave Type="D3">
+          <Start>REAL\BLOCK\RealBlockEject3d01.wav</Start>
         </Wave>
       </Waves>
     </Sound>

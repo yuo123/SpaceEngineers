@@ -198,7 +198,7 @@ namespace Sandbox.Common.ObjectBuilders
         [GameRelationAttribute(Game.SpaceEngineers)]
         public int ViewDistance = 20000;
 
-		[ProtoMember]
+        [ProtoMember]
 		[Display(Name = "Flora density")]
 		[GameRelationAttribute(Game.SpaceEngineers)]
 		public int FloraDensity = 20;
@@ -230,7 +230,7 @@ namespace Sandbox.Common.ObjectBuilders
         [GameRelationAttribute(Game.SpaceEngineers)]
         public bool EnableEncounters = true;
 
-		[ProtoMember]
+        [ProtoMember]
 		[Display(Name = "Enable flora")]
 		[GameRelationAttribute(Game.SpaceEngineers)]
 		public bool EnableFlora = true;
@@ -258,7 +258,7 @@ namespace Sandbox.Common.ObjectBuilders
         public bool DisableRespawnShips = false;
 
         [ProtoMember]
-        [Display(Name = "Scenario edit mode")]
+        [Display(Name = "")]
         [GameRelationAttribute(Game.SpaceEngineers)]
         public bool ScenarioEditMode = false;
 
@@ -268,12 +268,12 @@ namespace Sandbox.Common.ObjectBuilders
         public bool Battle = false;
 
         [ProtoMember]
-        [Display(Name = "Scenario")]
+        [Display(Name = "")]
         [GameRelationAttribute(Game.SpaceEngineers)]
         public bool Scenario = false;
 
         [ProtoMember]
-        [Display(Name = "Can join running")]
+        [Display(Name = "")]
         [GameRelationAttribute(Game.SpaceEngineers)]
         public bool CanJoinRunning = false;
 

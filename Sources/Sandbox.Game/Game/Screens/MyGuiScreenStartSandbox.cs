@@ -127,10 +127,10 @@ namespace Sandbox.Game.Gui
         {
             var settings = MyObjectBuilderSerializer.CreateNewObject<MyObjectBuilder_SessionSettings>();
             settings.GameMode = MyGameModeEnum.Creative;
-            settings.EnableStationVoxelSupport = true;
+            settings.EnableStationVoxelSupport = MyPerGameSettings.Game == GameEnum.SE_GAME;
             settings.EnableToolShake = true;
-            settings.EnablePlanets = MyFakes.ENABLE_PLANETS;
-            settings.EnableSunRotation = true;
+            settings.EnablePlanets = (MyPerGameSettings.Game == GameEnum.SE_GAME) && MyFakes.ENABLE_PLANETS;
+            settings.EnableSunRotation = MyPerGameSettings.Game == GameEnum.SE_GAME;
             settings.VoxelGeneratorVersion = MyVoxelConstants.VOXEL_GENERATOR_VERSION;
             settings.EnableOxygen = true;
             MyWorldGenerator.SetProceduralSettings(-1, settings);
@@ -178,27 +178,27 @@ namespace Sandbox.Game.Gui
         {
             if (MySteam.IsOnline)
             {
-                if (MyFakes.ENABLE_TUTORIAL_PROMPT && MySandboxGame.Config.NeedShowBattleTutorialQuestion)
-                {
-                    MyGuiSandbox.AddScreen(MyGuiSandbox.CreateMessageBox(buttonType: MyMessageBoxButtonsType.YES_NO,
-                        messageText: MyTexts.Get(MySpaceTexts.MessageBoxTextTutorialQuestion),
-                        messageCaption: MyTexts.Get(MySpaceTexts.MessageBoxCaptionVideoTutorial),
-                        callback: delegate(MyGuiScreenMessageBox.ResultEnum val)
-                        {
-                            if (val == MyGuiScreenMessageBox.ResultEnum.YES)
+            if (MyFakes.ENABLE_TUTORIAL_PROMPT && MySandboxGame.Config.NeedShowBattleTutorialQuestion)
+            {
+                MyGuiSandbox.AddScreen(MyGuiSandbox.CreateMessageBox(buttonType: MyMessageBoxButtonsType.YES_NO,
+                    messageText: MyTexts.Get(MySpaceTexts.MessageBoxTextTutorialQuestion),
+                    messageCaption: MyTexts.Get(MySpaceTexts.MessageBoxCaptionVideoTutorial),
+                    callback: delegate(MyGuiScreenMessageBox.ResultEnum val)
+                    {
+                        if (val == MyGuiScreenMessageBox.ResultEnum.YES)
                                 MyGuiSandbox.OpenUrlWithFallback(MySteamConstants.URL_GUIDE_BATTLE, "Steam Guide");
-                            else
-                                MyGuiSandbox.AddScreen(MyGuiSandbox.CreateScreen(MyPerGameSettings.GUI.BattleScreen));
-                        }));
+                        else
+                            MyGuiSandbox.AddScreen(MyGuiSandbox.CreateScreen(MyPerGameSettings.GUI.BattleScreen));
+                    }));
 
-                    MySandboxGame.Config.NeedShowBattleTutorialQuestion = false;
-                    MySandboxGame.Config.Save();
-                }
-                else
-                {
-                    MyGuiSandbox.AddScreen(MyGuiSandbox.CreateScreen(MyPerGameSettings.GUI.BattleScreen));
-                }
+                MySandboxGame.Config.NeedShowBattleTutorialQuestion = false;
+                MySandboxGame.Config.Save();
             }
+            else
+                {
+                MyGuiSandbox.AddScreen(MyGuiSandbox.CreateScreen(MyPerGameSettings.GUI.BattleScreen));
+        }
+    }
             else
             {
                 MyGuiSandbox.AddScreen(MyGuiSandbox.CreateMessageBox(

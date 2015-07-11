@@ -1383,12 +1383,12 @@ namespace Sandbox.Game.Entities.Cube
             foreach (var cb in lst)
             {
                 var b = m_grid.GetCubeBlock(cb.Position);
-                if ( b!= null)
+                if (b != null)
                 {
-                    if(b.FatBlock != null)
+                    if (b.FatBlock != null)
                         b.FatBlock.OnDestroy();
                     m_grid.RemoveBlock(b, true);
-                    if(first)
+                    if (first)
                     {
                         PlayDestructionSound(b);
                         first = false;
@@ -1405,20 +1405,20 @@ namespace Sandbox.Game.Entities.Cube
         private void PlayDestructionSound(MySlimBlock b)
         {
             MyPhysicalMaterialDefinition def = null;
-            if(b.FatBlock is MyCompoundCubeBlock)
+            if (b.FatBlock is MyCompoundCubeBlock)
             {
                 def = (b.FatBlock as MyCompoundCubeBlock).GetBlocks()[0].BlockDefinition.PhysicalMaterial;
             }
             else if (b.FatBlock is MyFracturedBlock)
             {
                 MyCubeBlockDefinition bDef;
-                if(MyDefinitionManager.Static.TryGetDefinition<MyCubeBlockDefinition>((b.FatBlock as MyFracturedBlock).OriginalBlocks[0], out bDef))
+                if (MyDefinitionManager.Static.TryGetDefinition<MyCubeBlockDefinition>((b.FatBlock as MyFracturedBlock).OriginalBlocks[0], out bDef))
                     def = bDef.PhysicalMaterial;
             }
             else
                 def = b.BlockDefinition.PhysicalMaterial;
 
-            if(def == null)
+            if (def == null)
                 return;
 
             MySoundPair destructionCue;
@@ -1619,7 +1619,7 @@ namespace Sandbox.Game.Entities.Cube
                 Shape.CreateConnectionToWorld(BreakableBody);
                 if (wasfixed && m_grid.GridSizeEnum == MyCubeSize.Small)
                 {
-                    if(MyCubeGridSmallToLargeConnection.Static.TestGridSmallToLargeConnection(m_grid))
+                    if (MyCubeGridSmallToLargeConnection.Static.TestGridSmallToLargeConnection(m_grid))
                     {
                         RigidBody.UpdateMotionType(HkMotionType.Fixed);
                         RigidBody.Quality = HkCollidableQualityType.Fixed;

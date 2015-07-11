@@ -92,7 +92,7 @@ namespace Sandbox.Game.Gui
         private MyGuiControlSlider m_procAsteroidSize;
         private MyGuiControlTextbox m_procAsteroidSeed;
 
-    
+
         private MyVoxelBase m_currentVoxel = null;
 
         public override string GetFriendlyName()
@@ -570,15 +570,15 @@ namespace Sandbox.Game.Gui
         private void SpawnPlanet(int seed,float size,Vector3D? pos = null)
         {
             var storageNameBase = "Planet" + "-" + seed + "d" + size;
-
+          
             var storageName = MakeStorageName(storageNameBase);
 
             if (pos.HasValue == false)
             {
                 pos = MySession.LocalHumanPlayer.GetPosition();
-            }
+        }
 
-            var previewVoxelMap = MyWorldGenerator.AddPlanet(storageNameBase, MySession.LocalHumanPlayer.GetPosition(), seed, size, MyRandom.Instance.NextLong());
+            MyWorldGenerator.AddPlanet(storageNameBase, MySession.LocalHumanPlayer.GetPosition(), seed, size, MyRandom.Instance.NextLong());
         }
 
         private static String MakeStorageName(String storageNameBase)
@@ -651,7 +651,7 @@ namespace Sandbox.Game.Gui
             CreatePlanetControls(list, usableWidth);
 
             AddSeparator(list);
-  
+
             var button = CreateDebugButton(usableWidth, MySpaceTexts.ScreenDebugSpawnMenu_SpawnAsteroid, OnSpawnProceduralAsteroid); 
             Controls.Remove(button);
             list.Controls.Add(button);
@@ -660,13 +660,13 @@ namespace Sandbox.Game.Gui
         }
 
         private void CreatePlanetControls(MyGuiControlList list, float usableWidth)
-        {   
+        {
             var asteroidSizeLabel = CreateSliderWithDescription(list, usableWidth, 8000f, 50000f, MyTexts.GetString(MySpaceTexts.ScreenDebugSpawnMenu_ProceduralSize), ref m_procAsteroidSize);
 
             m_procAsteroidSize.ValueChanged += (MyGuiControlSlider s) => { asteroidSizeLabel.Text = MyValueFormatter.GetFormatedFloat(s.Value, 0) + "m"; m_procAsteroidSizeValue = s.Value; };
             m_procAsteroidSize.Value = 8000.1f;
 
-            m_procAsteroidSeed = CreateSeedButton(list, m_procAsteroidSeedValue, usableWidth);  
+            m_procAsteroidSeed = CreateSeedButton(list, m_procAsteroidSeedValue, usableWidth);
         }
 
         private MyGuiControlTextbox CreateSeedButton(MyGuiControlList list, string seedValue, float usableWidth)

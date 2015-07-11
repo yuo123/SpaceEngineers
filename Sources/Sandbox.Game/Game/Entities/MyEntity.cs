@@ -96,6 +96,7 @@ namespace Sandbox.Game.Entities
         //Space query structure
         public int GamePruningProxyId = MyConstants.PRUNING_PROXY_ID_UNITIALIZED;
         public int TopMostPruningProxyId = MyConstants.PRUNING_PROXY_ID_UNITIALIZED;
+        public int TargetPruningProxyId = MyConstants.PRUNING_PROXY_ID_UNITIALIZED;
 
         #endregion
 
@@ -851,7 +852,7 @@ namespace Sandbox.Game.Entities
                 if (world != null)
                     this.m_physics.Activate(world, VRageMath.Spatial.MyClusterTree.CLUSTERED_OBJECT_ID_UNITIALIZED);
                 else
-                    this.m_physics.Activate();
+                this.m_physics.Activate();
 
 
                 VRageRender.MyRenderProxy.GetRenderProfiler().EndProfilingBlock();
@@ -911,7 +912,7 @@ namespace Sandbox.Game.Entities
             if (this.m_physics != null && this.m_physics.Enabled)
             {
                 if (world == null)
-                    this.m_physics.Deactivate();
+                this.m_physics.Deactivate();
                 else
                     this.m_physics.Deactivate(world);
             }
@@ -975,6 +976,9 @@ namespace Sandbox.Game.Entities
                     this.EntityId = objectBuilder.EntityId;
                 this.Name = objectBuilder.Name;
                 this.Render.PersistentFlags = objectBuilder.PersistentFlags;
+
+                if (MyPerGameSettings.ComponentSaving && objectBuilder.ComponentContainer != null)
+                    this.Components.Deserialize(objectBuilder.ComponentContainer);
             }
 
             AllocateEntityID();
@@ -1265,6 +1269,9 @@ namespace Sandbox.Game.Entities
 
                 objBuilder.Name = this.Name;
                 objBuilder.PersistentFlags = Render.PersistentFlags;
+
+                if (MyPerGameSettings.ComponentSaving)
+                    objBuilder.ComponentContainer = Components.Serialize();
             }
             return objBuilder;
         }

@@ -233,6 +233,10 @@ namespace Sandbox.Engine.Physics
             set
             {
                 m_ragdoll = value;
+                if (m_ragdoll != null)
+                {
+                    m_ragdoll.AddedToWorld += OnRagdollAddedToWorld;
+                }
             }
         }
 
@@ -1691,6 +1695,17 @@ false,
             set { m_isStaticForCluster = value; }
         }
 
+<<<<<<< HEAD
+=======
+        /// <summary>
+        /// Returns true when linear velocity or angular velocity is non-zero.
+        /// </summary>
+        public bool IsMoving
+        {
+            get { return !Vector3.IsZero(LinearVelocity) || !Vector3.IsZero(AngularVelocity); }
+        }
+
+>>>>>>> KSH/master
         public Vector3 Gravity
         {
             get
@@ -2267,18 +2282,27 @@ false,
             Matrix world = Entity.WorldMatrix;
             world.Translation = WorldToCluster(world.Translation);
             Debug.Assert(world.IsValid() && world != Matrix.Zero, "Ragdoll world matrix is invalid!");
+            
             //Ragdoll.ResetToRigPose();
+            
             Ragdoll.SetWorldMatrix(world);
             Ragdoll.SetTransforms(world, false);
+            
             //foreach (var body in Ragdoll.RigidBodies)
             //{
             //    body.UserObject = this;
             //}
             //Ragdoll.OptimizeInertiasOfConstraintTree();
-            HavokWorld.AddRagdoll(Ragdoll);
-            Ragdoll.EnableConstraints();
-            Ragdoll.Activate();
+            
 
+            HavokWorld.AddRagdoll(Ragdoll);
+        }
+
+        private void OnRagdollAddedToWorld()
+        {
+            Debug.Assert(Ragdoll.IsAddedToWorld, "Ragdoll was not added to world!");
+            Ragdoll.Activate();
+            Ragdoll.EnableConstraints();
             if (OnRagdollActivated != null)
                 OnRagdollActivated(this, null);
         }

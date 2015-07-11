@@ -268,7 +268,7 @@ namespace Sandbox.Game.Entities.Blocks
                                              : 0.0f;
         }
 
-        void m_inventory_ContentsChanged(MyInventory obj)
+        void m_inventory_ContentsChanged(MyInventoryBase obj)
         {
             RaisePropertiesChanged();
         }
@@ -392,19 +392,19 @@ namespace Sandbox.Game.Entities.Blocks
                     if (i <= fillCount)
                     {
                         VRageRender.MyRenderProxy.UpdateModelProperties(Render.RenderObjectIDs[0], 0, null, -1, m_emissiveNames[i], null, color, null, null, 0);
-                    }
-                    else
-                    {
+                }
+                else
+                {
                         VRageRender.MyRenderProxy.UpdateModelProperties(Render.RenderObjectIDs[0], 0, null, -1, m_emissiveNames[i], null, Color.Black, null, null, 0);
-                    }
+                }
                 }
                 m_prevColor = color;
                 m_prevFillCount = fillCount;
-            }
-        }
+                }
+                }
 
         public override void OnModelChange()
-        {
+                {
             base.OnModelChange();
 
             m_prevFillCount = -1;
@@ -467,6 +467,11 @@ namespace Sandbox.Game.Entities.Blocks
 
         internal void Fill(float amount)
         {
+            if (amount == 0f)
+            {
+                return;
+            }
+
             FilledRatio += amount / Capacity;
             FilledRatio = Math.Min(1f, FilledRatio);
 
@@ -489,6 +494,11 @@ namespace Sandbox.Game.Entities.Blocks
 
         internal void Drain(float amount)
         {
+            if (amount == 0f)
+            {
+                return;
+            }
+
             Debug.Assert(!IsStockpiling, "Stockpiling tank should not be drained");
             FilledRatio -= amount / Capacity;
             FilledRatio = Math.Max(0f, FilledRatio);

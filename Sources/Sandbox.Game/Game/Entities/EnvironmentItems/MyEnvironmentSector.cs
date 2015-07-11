@@ -97,8 +97,9 @@ namespace Sandbox.Game.Entities.EnvironmentItems
                 if (m_invalidateAABB)
                 {
                     Debug.Assert(IsValid);
+                    m_invalidateAABB = false;
                     m_AABB = GetSectorBoundingBox();
-                }
+        }
                 return m_AABB; 
             }
         }
@@ -294,7 +295,7 @@ namespace Sandbox.Game.Entities.EnvironmentItems
                 }
 
                 if (hasAnyInstances)
-                {                
+                {
                     MyRenderProxy.UpdateRenderEntity(renderObjectId, Vector3.One, Vector3.Zero, useTransparency ? transparency : 0);
                     MyRenderProxy.UpdateRenderObject(renderObjectId, ref m_sectorMatrix, false);
                     MyRenderProxy.SetInstanceBuffer(renderObjectId, item.Value.InstanceBufferId, item.Value.InstanceStart, item.Value.InstanceCount, SectorBox);
@@ -322,7 +323,7 @@ namespace Sandbox.Game.Entities.EnvironmentItems
                  
                 }
             }
-            
+
             /*BoundingBoxD bb = new BoundingBoxD(sectorPos * sectorSize, (sectorPos + Vector3I.One) * sectorSize);
             BoundingBoxD bb2 = new BoundingBoxD(m_AABB.Min, m_AABB.Max);
             bb2.Min = Vector3D.Max(bb2.Min, bb.Min);
