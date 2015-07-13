@@ -1093,14 +1093,14 @@ namespace Sandbox.Engine.Physics
 
         public static bool InsideSimulation { get; private set; }
 
-        public static void AddEntityToBubble(MyEntity entity, bool insertIntoScene = true)
+        public static void AddEntityToBubble(MyEntity entity)
         {
             foreach (Bubble bubble in Bubbles)
             {
                 //if eligible bubble already exists, add the entity to it
                 if (bubble.CanBeInBubble(entity))
                 {
-                    bubble.AddEntityAndCompensate(entity, insertIntoScene);
+                    bubble.AddEntityAndCompensate(entity);
                     return;
                 }
             }
@@ -1109,7 +1109,7 @@ namespace Sandbox.Engine.Physics
             Bubble nbubble = new Bubble();
             nbubble.PositionComp.SetPosition(entity.PositionComp.GetPosition());
             nbubble.Physics.LinearVelocity = entity.Physics.LinearVelocity;
-            nbubble.AddEntityAndCompensate(entity, insertIntoScene);//MTODO: possibly optimize by setting entity's pos and vel to zero instead of calling the compensate method
+            nbubble.AddEntityAndCompensate(entity);//MTODO: possibly optimize by setting entity's pos and vel to zero instead of calling the compensate method
             Bubbles.Add(nbubble);
         }
     }

@@ -73,7 +73,7 @@ namespace Sandbox.Game.Entities
             if(TopMostEntitiesTypes.Contains(entity.GetType()))
             {
                 entity.TopMostPruningProxyId = m_topMostEntitiesTree.AddProxy(ref bbox, entity, 0);
-                }
+                
             }  
           
             if(TopMostEntitiesTypes.Contains(entity.GetType()))

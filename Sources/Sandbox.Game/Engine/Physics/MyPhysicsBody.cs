@@ -66,7 +66,7 @@ namespace Sandbox.Engine.Physics
         public static HkGeometry DebugGeometry;
         Dictionary<string, Vector3D> DebugShapesPositions = new Dictionary<string, Vector3D>();
 
-        public int HavokCollisionSystemID = 0;
+        public int HavokCollisionSystemID=0;
         private HkRigidBody m_rigidBody;
         public virtual HkRigidBody RigidBody
         {
@@ -236,8 +236,8 @@ namespace Sandbox.Engine.Physics
                 if (m_ragdoll != null)
                 {
                     m_ragdoll.AddedToWorld += OnRagdollAddedToWorld;
-                }
             }
+        }
         }
 
         public MyCharacterProxy CharacterProxy { get; set; }
@@ -766,7 +766,7 @@ namespace Sandbox.Engine.Physics
             List<HkdShapeInstanceInfo> children = new List<HkdShapeInstanceInfo>();
             breakableShape.GetChildren(children);
 
-            Vector3 parentCom = breakableShape.CoM;
+            Vector3 parentCom =  breakableShape.CoM;
 
             foreach (var shapeInst in children)
             {
@@ -1429,13 +1429,13 @@ false,
                 return;
 
             //System.Diagnostics.Debug.Assert(!IsInWorld);
-            if (InBubble)
-                MyPhysics.AddEntityToBubble((MyEntity)Entity, false);
+            if (InBubble && Bubble != null)
+                Bubble.AddEntityToBubble((MyEntity)Entity, false);
             else
                 ClusterObjectID = MyPhysics.Clusters.AddObject(Entity.WorldAABB, LinearVelocity, this, null);
         }
 
-        protected virtual void ActivateCollision() { }
+        protected virtual void ActivateCollision(){}
 
         public virtual void Activate(object world, ulong clusterObjectID)
         {
@@ -1553,9 +1553,7 @@ false,
         /// </summary>
         public override void Deactivate()
         {
-            if (InBubble && Bubble != null)
-                Bubble.RemoveEntityFromBubble((MyEntity)Entity);
-            else if (ClusterObjectID != MyClusterTree.CLUSTERED_OBJECT_ID_UNITIALIZED)
+            if (ClusterObjectID != MyClusterTree.CLUSTERED_OBJECT_ID_UNITIALIZED)
             {
                 MyPhysics.Clusters.RemoveObject(ClusterObjectID);
                 ClusterObjectID = MyHavokCluster.CLUSTERED_OBJECT_ID_UNITIALIZED;
@@ -2152,7 +2150,7 @@ false,
             return old;
         }
 
-        public void SwitchToRagdollMode(bool deadMode = true, int firstRagdollSubID = 1)
+        public void SwitchToRagdollMode(bool deadMode = true, int firstRagdollSubID = 1 )
         {
             if (!Enabled) return;
 
@@ -2240,7 +2238,7 @@ false,
 
             foreach (var body in Ragdoll.RigidBodies)
             {
-                body.UserObject = deadMode ? this : null;
+                body.UserObject = deadMode? this : null;
 
                 // TODO: THIS SHOULD BE SET IN THE RAGDOLL MODEL AND NOT DEFINING IT FOR EVERY MODEL HERE
                 body.Motion.SetDeactivationClass(deadMode ? HkSolverDeactivation.High : HkSolverDeactivation.Medium);// - TODO: Find another way - this is deprecated by Havok

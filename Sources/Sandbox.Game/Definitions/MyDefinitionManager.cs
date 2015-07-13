@@ -674,7 +674,7 @@ namespace Sandbox.Definitions
                 Check(failOnDebug, "Flora", failOnDebug, WARNING_ON_REDEFINITION_MESSAGE);
                 InitPlanetPrefabDefinitions(context,ref definitionSet.m_planetPrefabDefinitions, objBuilder.PlanetPrefabs, failOnDebug);
         }
-        }
+        
 
             if (objBuilder.FloraElements != null)
             {

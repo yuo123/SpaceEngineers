@@ -644,7 +644,7 @@ namespace Sandbox.Game.Entities.EnvironmentItems
                 if (sync)
             {
                     MySyncEnvironmentItems.SendModifyModelMessage(EntityId, itemInstanceId, localModelId);
-                }
+                
             }
 
             return true;
