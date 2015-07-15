@@ -74,8 +74,8 @@ namespace Sandbox.Game.Entities
             {
                 entity.TopMostPruningProxyId = m_topMostEntitiesTree.AddProxy(ref bbox, entity, 0);
                 
-            }  
-          
+            }
+            bool isTarget = false;
             if(TopMostEntitiesTypes.Contains(entity.GetType()))
             {
                 entity.TopMostPruningProxyId = m_topMostEntitiesTree.AddProxy(ref bbox, entity, 0);

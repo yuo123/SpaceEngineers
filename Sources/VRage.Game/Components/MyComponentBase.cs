@@ -78,13 +78,5 @@ namespace VRage.Components
         public virtual void Deserialize(MyObjectBuilder_ComponentBase builder)
         {
         }
-
-        public virtual void OnAddedToScene()
-        {
-        }
-
-        public virtual void OnRemovedFromScene()
-        {
-        }
     }
 }

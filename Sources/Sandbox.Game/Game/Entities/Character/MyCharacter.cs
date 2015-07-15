@@ -131,10 +131,6 @@ namespace Sandbox.Game.Entities.Character
     [MyEntityType(typeof(MyObjectBuilder_Character))]
     public partial class MyCharacter :
         MySkinnedEntity,
-<<<<<<< HEAD
-        IMyComponentOwner<MyComponentInventoryAggregate>,
-=======
->>>>>>> KSH/master
         IMyCameraController,
         IMyControllableEntity,
         IMyInventoryOwner,
@@ -263,10 +259,6 @@ namespace Sandbox.Game.Entities.Character
         CapsuleD[] m_bodyCapsules = new CapsuleD[1];//new CapsuleD[10];
         MatrixD m_headMatrix = MatrixD.CreateTranslation(0, 1.65, 0);
 
-<<<<<<< HEAD
-
-=======
->>>>>>> KSH/master
         MyHudNotification m_pickupObjectNotification;
         MyHudNotification m_inertiaDampenersNotification;
         MyHudNotification m_broadcastingNotification;
@@ -289,10 +281,6 @@ namespace Sandbox.Game.Entities.Character
         MyInventory m_inventory;
         MyBattery m_suitBattery;
         MyPowerDistributor m_suitPowerDistributor;
-<<<<<<< HEAD
-        List<MyPhysicalInventoryItem> m_inventoryResults = new List<MyPhysicalInventoryItem>();
-=======
->>>>>>> KSH/master
 
         bool m_dampenersEnabled = true;
         bool m_jetpackEnabled = false;
@@ -569,26 +557,6 @@ namespace Sandbox.Game.Entities.Character
 
         public event Action<MyCharacter> CharacterDied;
 
-<<<<<<< HEAD
-        private MyComponentInventoryAggregate m_inventoryAggregate;
-        public MyComponentInventoryAggregate InventoryAggregate
-        {
-            get
-            {
-                return m_inventoryAggregate;
-            }
-            set
-            {
-                if (m_inventoryAggregate == null)
-                {
-                    Components.Add<MyComponentInventoryAggregate>(value);
-                }
-                else
-                {
-                    Components.Remove<MyComponentInventoryAggregate>();
-                }
-                m_inventoryAggregate = value;
-=======
         public MyInventoryAggregate InventoryAggregate
         {
             get
@@ -596,14 +564,13 @@ namespace Sandbox.Game.Entities.Character
                 var aggregate = Components.Get<MyInventoryBase>() as MyInventoryAggregate;
                 return aggregate;
             }
-            set 
+            set
             {
                 if (Components.Has<MyInventoryBase>())
                 {
                     Components.Remove<MyInventoryBase>();
                 }
                 Components.Add<MyInventoryBase>(value);
->>>>>>> KSH/master
             }
         }
 
@@ -684,17 +651,6 @@ namespace Sandbox.Game.Entities.Character
             this.Render = new MyRenderComponentCharacter();
             StatComp = new MyCharacterStatComponent();
 
-<<<<<<< HEAD
-            // TODO: When this Inventory system is working well, remove it and use it as default for SE too
-            if (MyFakes.ENABLE_MEDIEVAL_INVENTORY)
-            {
-                InventoryAggregate = new MyComponentInventoryAggregate(this);
-            }
-
-            AddDebugRenderComponent(new MyDebugRenderComponentCharacter(this));
-
-            Components.Add<MyCharacterDetectorComponent>(new MyCharacterRaycastDetectorComponent());
-=======
             AddDebugRenderComponent(new MyDebugRenderComponentCharacter(this));
 
             if (MyPerGameSettings.CharacterDetectionComponent != null)
@@ -703,7 +659,6 @@ namespace Sandbox.Game.Entities.Character
                 Components.Add<MyCharacterDetectorComponent>(new MyCharacterRaycastDetectorComponent());
 
             //Components.Add<MyCharacterDetectorComponent>(new MyCharacterShapecastDetectorComponent());
->>>>>>> KSH/master
         }
 
         /// <summary>
@@ -799,18 +754,7 @@ namespace Sandbox.Game.Entities.Character
                 if (m_currentMovementState != MyCharacterMovementEnum.Died) SetCurrentMovementState(MyCharacterMovementEnum.Died);
                 SwitchAnimation(MyCharacterMovementEnum.Died, false);
             }
-
-<<<<<<< HEAD
-            InventoryVolume = m_characterDefinition.InventoryVolume;
-            InventoryMass = m_characterDefinition.InventoryMass;
-            InventorySize = new Vector3(m_characterDefinition.InventorySizeX, m_characterDefinition.InventorySizeY, m_characterDefinition.InventorySizeZ);
-            m_inventory = new MyInventory(InventoryVolume, InventoryMass, InventorySize, 0, this);
-            m_inventory.Init(characterOb.Inventory);
-            m_inventory.ContentsChanged += inventory_OnContentsChanged;
-            m_inventory.ContentsChanged += MyToolbarComponent.CurrentToolbar.CharacterInventory_OnContentsChanged;
-=======
             InitInventory(characterOb);
->>>>>>> KSH/master
 
             Physics.Enabled = true;
 
@@ -871,11 +815,7 @@ namespace Sandbox.Game.Entities.Character
             if (m_stats != null)
             {
                 MyStatsDefinition statsDefinition = null;
-<<<<<<< HEAD
                 if (MyDefinitionManager.Static.TryGetDefinition(new MyDefinitionId(typeof(MyObjectBuilder_StatsDefinition), Definition.Stats), out statsDefinition))
-=======
-				if(MyDefinitionManager.Static.TryGetDefinition(new MyDefinitionId(typeof(MyObjectBuilder_StatsDefinition), Definition.Stats), out statsDefinition))
->>>>>>> KSH/master
                     m_stats.InitStats(statsDefinition);
             }
 
@@ -929,8 +869,6 @@ namespace Sandbox.Game.Entities.Character
             InitSounds();
 
             if (InventoryAggregate != null) InventoryAggregate.Init();
-<<<<<<< HEAD
-=======
         }
 
         private void InitInventory(MyObjectBuilder_Character characterOb)
@@ -966,7 +904,6 @@ namespace Sandbox.Game.Entities.Character
                     InventoryAggregate.AddComponent(m_inventory);
                 }
             }
->>>>>>> KSH/master
         }
 
         private void InitSounds()
@@ -1106,13 +1043,8 @@ namespace Sandbox.Game.Entities.Character
         void inventory_OnContentsChanged(MyInventoryBase inventory)
         {
             // Switch away from the weapon if we don't have it; Cube placer is an exception
-<<<<<<< HEAD
-            if (m_currentWeapon != null && m_currentWeapon.DefinitionId.TypeId != typeof(MyObjectBuilder_CubePlacer)
-                && inventory != null && !inventory.ContainItems(1, m_currentWeapon.PhysicalObject))
-=======
             if (m_currentWeapon != null && WeaponTakesBuilderFromInventory(m_currentWeapon.DefinitionId)
                 && inventory != null && inventory is MyInventory && !(inventory as MyInventory).ContainItems(1, m_currentWeapon.PhysicalObject))
->>>>>>> KSH/master
                 SwitchToWeapon(null);
         }
 
@@ -1482,7 +1414,7 @@ namespace Sandbox.Game.Entities.Character
             objectBuilder.ColorMaskHSV = ColorMask;
 
             if (!MyPerGameSettings.ComponentSaving)
-            objectBuilder.Inventory = m_inventory.GetObjectBuilder();
+                objectBuilder.Inventory = m_inventory.GetObjectBuilder();
 
             if (m_currentWeapon != null)
                 objectBuilder.HandWeapon = ((MyEntity)m_currentWeapon).GetObjectBuilder();
@@ -2673,21 +2605,28 @@ namespace Sandbox.Game.Entities.Character
                     Physics.CharacterProxy.Gravity = Vector3.Zero;
                     if (!m_isFlying && m_dampenersEnabled)
                     {
-                        Physics.CharacterProxy.LinearVelocity = Physics.CharacterProxy.LinearVelocity * m_characterDefinition.JetpackSlowdown;
+                        if (Physics.InBubble && Physics.Bubble != null)
+                        {
+                            //if in bubble, make inertia dampening absolute. MTODO: possibly re-implement dampeners properly, see:https://github.com/KeenSoftwareHouse/SpaceEngineers/issues/310
+                            Vector3 velocity = Physics.CharacterProxy.LinearVelocity;
+                            velocity += Physics.Bubble.Physics.LinearVelocity;
+                            velocity *= m_characterDefinition.JetpackSlowdown;
+                            velocity -= Physics.Bubble.Physics.LinearVelocity;
+                            Physics.CharacterProxy.LinearVelocity = velocity;
+                        }
+                        else
+                            Physics.CharacterProxy.LinearVelocity = Physics.CharacterProxy.LinearVelocity * m_characterDefinition.JetpackSlowdown;
                     }
                     if (Physics.CharacterProxy.LinearVelocity.Length() < MINIMAL_SPEED)
                     {
                         Physics.CharacterProxy.LinearVelocity = Vector3.Zero;
                     }
-<<<<<<< HEAD
-=======
 
                     // On planets limit the jetpack strength
                     if (MyFakes.ENABLE_PLANETS_JETPACK_LIMIT)
                     {
                         LimitJetpackVelocity();
                     }
->>>>>>> KSH/master
                 }
                 //Solve Y orientation and gravity only in non flying mode
                 else if (!IsDead)
@@ -3267,9 +3206,9 @@ namespace Sandbox.Game.Entities.Character
                 }
             }
             else if (Physics.CharacterProxy != null)
-                {
-                    Physics.CharacterProxy.Elevate = 0;
-                }
+            {
+                Physics.CharacterProxy.Elevate = 0;
+            }
 
             if (rotationIndicator.Y != 0 && (canRotate || m_isFalling || m_currentJump > 0))
             {
@@ -3345,50 +3284,50 @@ namespace Sandbox.Game.Entities.Character
                 }
             }
 
-                if (rotationIndicator.X != 0)
+            if (rotationIndicator.X != 0)
+            {
+                if (!CanFly())
                 {
-                    if (!CanFly())
+                    if (((m_currentMovementState == MyCharacterMovementEnum.Died) && !m_isInFirstPerson)
+                        ||
+                        (m_currentMovementState != MyCharacterMovementEnum.Died))
                     {
-                        if (((m_currentMovementState == MyCharacterMovementEnum.Died) && !m_isInFirstPerson)
-                            ||
-                            (m_currentMovementState != MyCharacterMovementEnum.Died))
+                        SetHeadLocalXAngle(MathHelper.Clamp(m_headLocalXAngle - rotationIndicator.X * CHARACTER_X_ROTATION_SPEED, MinHeadLocalXAngle, MaxHeadLocalXAngle));
+                        CalculateDependentMatrices();
+
+                        int headBone = IsInFirstPersonView ? m_headBoneIndex : m_camera3rdBoneIndex;
+
+                        if (headBone != -1)
                         {
-                            SetHeadLocalXAngle(MathHelper.Clamp(m_headLocalXAngle - rotationIndicator.X * CHARACTER_X_ROTATION_SPEED, MinHeadLocalXAngle, MaxHeadLocalXAngle));
-                            CalculateDependentMatrices();
-
-                            int headBone = IsInFirstPersonView ? m_headBoneIndex : m_camera3rdBoneIndex;
-
-                            if (headBone != -1)
-                            {
-                                m_bobQueue.Clear();
-                                m_bobQueue.Enqueue(BoneTransforms[headBone].Translation);
-                            }
+                            m_bobQueue.Clear();
+                            m_bobQueue.Enqueue(BoneTransforms[headBone].Translation);
                         }
                     }
-                else if (canRotate)
-                        {
-                            MatrixD rotationMatrix = WorldMatrix.GetOrientation();
-                            Vector3D translation = WorldMatrix.Translation + WorldMatrix.Up;
-
-                            if (Definition.VerticalPositionFlyingOnly)
-                            {
-                                SetHeadLocalXAngle(MathHelper.Clamp(m_headLocalXAngle - rotationIndicator.X * CHARACTER_X_ROTATION_SPEED, MinHeadLocalXAngle, MaxHeadLocalXAngle));
-                            }
-                            else
-                            {
-                                rotationMatrix = rotationMatrix * MatrixD.CreateFromAxisAngle(WorldMatrix.Right, rotationIndicator.X * -0.002f);
-                            }
-
-                            rotationMatrix.Translation = translation - rotationMatrix.Up;
-
-                            //Enable if we want limit character rotation in collisions
-                            //if (m_shapeContactPoints.Count < 2)
-                            {
-                                WorldMatrix = rotationMatrix;
-                                m_shapeContactPoints.Clear();
-                            }
-                        }
                 }
+                else if (canRotate)
+                {
+                    MatrixD rotationMatrix = WorldMatrix.GetOrientation();
+                    Vector3D translation = WorldMatrix.Translation + WorldMatrix.Up;
+
+                    if (Definition.VerticalPositionFlyingOnly)
+                    {
+                        SetHeadLocalXAngle(MathHelper.Clamp(m_headLocalXAngle - rotationIndicator.X * CHARACTER_X_ROTATION_SPEED, MinHeadLocalXAngle, MaxHeadLocalXAngle));
+                    }
+                    else
+                    {
+                        rotationMatrix = rotationMatrix * MatrixD.CreateFromAxisAngle(WorldMatrix.Right, rotationIndicator.X * -0.002f);
+                    }
+
+                    rotationMatrix.Translation = translation - rotationMatrix.Up;
+
+                    //Enable if we want limit character rotation in collisions
+                    //if (m_shapeContactPoints.Count < 2)
+                    {
+                        WorldMatrix = rotationMatrix;
+                        m_shapeContactPoints.Clear();
+                    }
+                }
+            }
 
             if (roll != 0)
             {
@@ -3546,11 +3485,7 @@ namespace Sandbox.Game.Entities.Character
 
                 m_previousMovementState = m_currentMovementState;
                 m_currentMovementState = state;
-<<<<<<< HEAD
                 if (OnMovementStateChanged != null)
-=======
-				if(OnMovementStateChanged != null)
->>>>>>> KSH/master
                     OnMovementStateChanged(m_previousMovementState, m_currentMovementState);
 
                 if (updateSync && SyncObject != null)
@@ -4960,11 +4895,7 @@ namespace Sandbox.Game.Entities.Character
                     gunEntity.EntityId = 0;
                 }
                 var handToolGun = gunEntity as MyObjectBuilder_HandTool;
-<<<<<<< HEAD
                 if (handToolGun != null)
-=======
-				if(handToolGun != null)
->>>>>>> KSH/master
                 {
                     handToolGun.IsDeconstructor = weapon.IsDeconstructor;
                     SwitchToWeaponInternal(weaponDefinition, sync, true, handToolGun, 0);
@@ -5209,30 +5140,17 @@ namespace Sandbox.Game.Entities.Character
             }
         }
 
-<<<<<<< HEAD
-        public MyGuiScreenBase ShowAggregateInventoryScreen()
-=======
         public MyGuiScreenBase ShowAggregateInventoryScreen(MyInventoryBase rightSelectedInventory = null)
->>>>>>> KSH/master
         {
             MyGuiScreenBase screen = null;
             if (MyPerGameSettings.GUI.InventoryScreen != null)
             {
-<<<<<<< HEAD
-                var aggregateComponent = Components.Get<MyComponentInventoryAggregate>();
-                if (aggregateComponent != null)
-                {
-                    aggregateComponent.Init();
-                    screen = MyGuiSandbox.CreateScreen(MyPerGameSettings.GUI.InventoryScreen, aggregateComponent);
-                    MyGuiSandbox.AddScreen(screen);
-=======
                 if (InventoryAggregate != null)
                 {
                     InventoryAggregate.Init();
                     screen = MyGuiSandbox.CreateScreen(MyPerGameSettings.GUI.InventoryScreen, InventoryAggregate, rightSelectedInventory);
-                    MyGuiSandbox.AddScreen( screen );
+                    MyGuiSandbox.AddScreen(screen);
                     screen.Closed += (scr) => { InventoryAggregate.DetachCallbacks(); };
->>>>>>> KSH/master
                 }
             }
             return screen;
@@ -5827,11 +5745,7 @@ namespace Sandbox.Game.Entities.Character
             Debug.Assert(blockDefinition.Components.Length != 0, "Missing components!");
 
             var inventory = MyCubeBuilder.BuildComponent.GetBuilderInventory(this);
-<<<<<<< HEAD
             if (inventory == null)
-=======
-			if(inventory == null)
->>>>>>> KSH/master
                 return false;
 
             return (inventory.GetItemAmount(blockDefinition.Components[0].Definition.Id) >= 1);
@@ -7572,18 +7486,8 @@ namespace Sandbox.Game.Entities.Character
             }
             if (MyPerGameSettings.GUI.InventoryScreen != null && IsDead)
             {
-<<<<<<< HEAD
-                // TODO: This should just open the screen of the character and not adding the the aggregate itself..
-                var otherAggregate = user.Components.Get<MyComponentInventoryAggregate>();
-                var aggregate = Components.Get<MyComponentInventoryAggregate>();
-                otherAggregate.AddChild(aggregate);
-                var screen = user.ShowAggregateInventoryScreen();
-                screen.Closed += delegate(MyGuiScreenBase source) { otherAggregate.RemoveChild(aggregate); };
-
-=======
                 var inventory = Components.Get<MyInventoryAggregate>();
-                var screen = user.ShowAggregateInventoryScreen(inventory);               
->>>>>>> KSH/master
+                var screen = user.ShowAggregateInventoryScreen(inventory);
             }
         }
 
@@ -8089,27 +7993,17 @@ namespace Sandbox.Game.Entities.Character
         //{
         //    return UseObject is T;
         //}
-<<<<<<< HEAD
-
-        public MyEntity ManipulatedEntity;
-
-        bool IMyComponentOwner<MyComponentInventoryAggregate>.GetComponent(out MyComponentInventoryAggregate component)
-        {
-            component = m_inventoryAggregate;
-            return m_inventoryAggregate != null;
-=======
 
         public MyEntity ManipulatedEntity;
 
         private void LimitJetpackVelocity()
         {
-            var planetGravity = MyGravityProviderSystem.CalculateGravityInPoint(PositionComp.WorldAABB.Center);           
-           
+            var planetGravity = MyGravityProviderSystem.CalculateGravityInPoint(PositionComp.WorldAABB.Center);
+
             if (planetGravity != Vector3.Zero)
             {
-                Physics.CharacterProxy.Gravity = planetGravity * CHARACTER_GRAVITY_MULTIPLIER;                
+                Physics.CharacterProxy.Gravity = planetGravity * CHARACTER_GRAVITY_MULTIPLIER;
             }
->>>>>>> KSH/master
         }
     }
 }

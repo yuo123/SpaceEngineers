@@ -1166,7 +1166,7 @@ namespace Sandbox
             MyGuiScreenMainMenu.UnloadAndExitToMenu();
 
             MyJoinGameHelper.JoinGame(lobby);
-        }
+        
         }
 
         void Matchmaking_ServerChangeRequest(string server, string password)

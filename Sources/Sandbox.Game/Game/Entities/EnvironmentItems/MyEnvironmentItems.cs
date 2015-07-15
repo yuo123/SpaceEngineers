@@ -274,7 +274,7 @@ namespace Sandbox.Game.Entities.EnvironmentItems
         /// <summary>
         /// Ends spawning - finishes preparetion of items data.
         /// </summary>
-        public static void EndSpawn(MyEnvironmentItemsSpawnData spawnData,bool updateGraphics = true)
+        public static void EndSpawn(MyEnvironmentItemsSpawnData spawnData, bool updateGraphics = true)
         {
             spawnData.EnvironmentItems.PrepareItemsPhysics(spawnData.SectorRootShape, ref spawnData.AabbWorld);
 
@@ -316,10 +316,10 @@ namespace Sandbox.Game.Entities.EnvironmentItems
         /// </summary>
         /// <returns>True if successfully added, otherwise false.</returns>
         private bool AddItem(
-            MyEnvironmentItemDefinition itemDefinition, 
-            ref MatrixD worldMatrix, 
+            MyEnvironmentItemDefinition itemDefinition,
+            ref MatrixD worldMatrix,
             ref BoundingBoxD aabbWorld,
-            HkStaticCompoundShape sectorRootShape, 
+            HkStaticCompoundShape sectorRootShape,
             Dictionary<MyStringHash, HkShape> subtypeIdToShape,
             int localModelId = MAIN_MODEL_LOCAL_ID)
         {
@@ -425,7 +425,7 @@ namespace Sandbox.Game.Entities.EnvironmentItems
                 if (savedModelsId.Count == itemDefinition.Models.Length)
                 {
                     for (int i = 0; i < itemDefinition.Models.Length; i++)
-            {
+                    {
                         Debug.Assert(savedModelsId[i] == MyModel.GetId(itemDefinition.Models[i]), "Environment item subtype id maps to a different model id than it used to!");
                     }
                 }
@@ -479,8 +479,8 @@ namespace Sandbox.Game.Entities.EnvironmentItems
                 MatrixD matrix = MatrixD.CreateTranslation(CellsOffset);
                 Physics.CreateFromCollisionObject((HkShape)sectorRootShape, Vector3.Zero, matrix, massProperties);
 
-                    Physics.ContactPointCallback += Physics_ContactPointCallback;
-                    Physics.RigidBody.ContactPointCallbackEnabled = true;
+                Physics.ContactPointCallback += Physics_ContactPointCallback;
+                Physics.RigidBody.ContactPointCallbackEnabled = true;
 
                 sectorRootShape.Base.RemoveReference();
 
@@ -632,41 +632,41 @@ namespace Sandbox.Game.Entities.EnvironmentItems
 
                 if (ItemModified != null)
                 {
-                    ItemModified(this, 
-                        new ItemInfo() 
+                    ItemModified(this,
+                        new ItemInfo()
             {
-                            LocalId = data.Id, 
-                            SubtypeId = data.SubtypeId, 
-                            Transform = data.Transform 
-                        });
-            }
+                LocalId = data.Id,
+                SubtypeId = data.SubtypeId,
+                Transform = data.Transform
+            });
+                }
 
                 if (sync)
-            {
+                {
                     MySyncEnvironmentItems.SendModifyModelMessage(EntityId, itemInstanceId, localModelId);
-                
+
+                }
+
+                return true;
             }
 
             return true;
         }
 
-            return true;
+        public bool TryGetItemInfoById(int itemId, out ItemInfo result)
+        {
+            result = new ItemInfo();
+            MyEnvironmentItemData data;
+            if (m_itemsData.TryGetValue(itemId, out data))
+            {
+                if (data.Enabled)
+                {
+                    result = new ItemInfo() { LocalId = itemId, SubtypeId = data.SubtypeId, Transform = data.Transform };
+                    return true;
+                }
+            }
+            return false;
         }
-
-		public bool TryGetItemInfoById(int itemId, out ItemInfo result)
-		{
-			result = new ItemInfo();
-			MyEnvironmentItemData data;
-			if (m_itemsData.TryGetValue(itemId, out data))
-			{
-				if (data.Enabled)
-				{
-					result = new ItemInfo() { LocalId = itemId, SubtypeId = data.SubtypeId, Transform = data.Transform };
-					return true;
-				}
-			}
-			return false;
-		}
 
         public void GetPhysicalItemsInRadius(Vector3D position, float radius, List<ItemInfo> result)
         {
@@ -859,31 +859,6 @@ namespace Sandbox.Game.Entities.EnvironmentItems
             return true;
         }
 
-        protected bool RemoveNonPhysicalItem(int itemInstanceId, bool sync)
-        {
-            Debug.Assert(sync == false || Sync.IsServer, "Synchronizing env. item removal from the client is forbidden!");
-            Debug.Assert(m_itemsData.ContainsKey(itemInstanceId), "Could not find env. item shape!");
-
-            MyEnvironmentItemData itemData = m_itemsData[itemInstanceId];
-            itemData.Enabled = false;
-            m_itemsData[itemInstanceId] = itemData;
-
-            Matrix matrix = itemData.Transform.TransformMatrix;
-            var sectorId = MyEnvironmentSector.GetSectorId(matrix.Translation, Definition.SectorSize);
-            var disabled = Sectors[sectorId].DisableInstance(itemData.SectorInstanceId, itemData.ModelId);
-            Debug.Assert(disabled, "Env. item instance render not disabled");
-            Sectors[sectorId].UpdateRenderInstanceData();
-
-            OnRemoveItem(itemInstanceId, ref matrix, itemData.SubtypeId);
-
-            if (sync)
-            {
-                MySyncEnvironmentItems.RemoveEnvironmentItem(EntityId, itemInstanceId);
-            }
-
-            return true;
-        }
-
         protected virtual void OnRemoveItem(int localId, ref Matrix matrix, MyStringHash myStringId)
         {
             if (ItemRemoved != null)
@@ -895,7 +870,7 @@ namespace Sandbox.Game.Entities.EnvironmentItems
                         SubtypeId = myStringId,
                         Transform = new MyTransformD(matrix),
                     });
-        }
+            }
         }
 
         private bool DisableRenderInstanceIfInRadius(Vector3D center, double radiusSq, int itemInstanceId, bool hasPhysics = false)
@@ -1099,8 +1074,8 @@ namespace Sandbox.Game.Entities.EnvironmentItems
                     EndBatch(true);
                 }
             }
-        }
-            }
+
+
         }
 
         protected override void ClampToWorld()
@@ -1158,20 +1133,6 @@ namespace Sandbox.Game.Entities.EnvironmentItems
 
             worldMatrix = itemData.Transform.TransformMatrix;
             return true;
-        }
-
-        Vector3D m_cellsOffset;
-        public Vector3D CellsOffset
-        {
-            set
-            {
-                m_cellsOffset = value;
-                PositionComp.SetPosition(m_cellsOffset);
-            }
-            get
-            {
-                return m_cellsOffset;
-            }
         }
 
         Vector3D m_cellsOffset;

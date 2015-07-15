@@ -5504,21 +5504,6 @@ namespace Sandbox.Game.Entities
                 if (generatingBlock != null)
                     return generatingBlock;
             }
-        }
-
-        // Returns generating block (not compound block, but block inside) from generated one.
-        public MySlimBlock GetGeneratingBlock(MySlimBlock generatedBlock)
-        {
-			if (generatedBlock == null)
-				return null;
-
-            foreach (var generator in AdditionalModelGenerators) 
-            {
-                var generatingBlock = generator.GetGeneratingBlock(generatedBlock);
-                if (generatingBlock != null)
-                    return generatingBlock;
-            }
-
             return null;
         }
 

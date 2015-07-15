@@ -139,27 +139,6 @@ namespace VRage.Components
             }
 		}
 
-        public void OnAddedToScene()
-        {
-            foreach (var component in m_components)
-            {
-                component.Value.OnAddedToScene();
-            }
-        }
-
-        public void OnRemovedFromScene()
-        {
-            foreach (var component in m_components)
-            {
-                component.Value.OnRemovedFromScene();
-            }
-        }
-
-        public Dictionary<Type, B>.ValueCollection.Enumerator GetEnumerator()
-        {
-            return m_components.Values.GetEnumerator();
-		}
-
         public void OnRemovedFromScene()
         {
             foreach (var component in m_components)

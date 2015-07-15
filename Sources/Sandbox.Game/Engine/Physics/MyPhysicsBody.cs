@@ -1692,9 +1692,6 @@ false,
             get { return m_isStaticForCluster; }
             set { m_isStaticForCluster = value; }
         }
-
-<<<<<<< HEAD
-=======
         /// <summary>
         /// Returns true when linear velocity or angular velocity is non-zero.
         /// </summary>
@@ -1703,7 +1700,6 @@ false,
             get { return !Vector3.IsZero(LinearVelocity) || !Vector3.IsZero(AngularVelocity); }
         }
 
->>>>>>> KSH/master
         public Vector3 Gravity
         {
             get
