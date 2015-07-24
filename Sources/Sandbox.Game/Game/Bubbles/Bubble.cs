@@ -100,15 +100,19 @@ namespace Sandbox.Game.Bubbles
             //grid2.OnAddedToScene(null, re.m_internWorld);
 
             //add character to debug bubble
-            MyEntities.Remove(MySession.LocalCharacter);
-            re.AddEntityToBubble(MySession.LocalCharacter);
-            MySession.LocalCharacter.EnableJetpack(true, false, true);
+            //MyEntities.Remove(MySession.LocalHumanPlayer.Character);
+            //re.AddEntityToBubble(MySession.LocalCharacter);
+            //MySession.LocalCharacter.EnableJetpack(true, false, true);
             //MySession.LocalCharacter.EnableDampeners(false, true);
 
             MyPhysics.Bubbles.Add(re);
         }
 
         public override void UpdateAfterSimulation()
+        {
+        }
+
+        public override void UpdateAfterSimulation100()
         {
             if (m_entities.Count == 0)
             {

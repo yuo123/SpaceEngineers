@@ -977,8 +977,7 @@ namespace Sandbox.Game.Entities
                 this.Name = objectBuilder.Name;
                 this.Render.PersistentFlags = objectBuilder.PersistentFlags;
 
-                if (MyPerGameSettings.ComponentSaving && objectBuilder.ComponentContainer != null)
-                    this.Components.Deserialize(objectBuilder.ComponentContainer);
+                this.Components.Deserialize(objectBuilder.ComponentContainer);
             }
 
             AllocateEntityID();
@@ -1270,8 +1269,7 @@ namespace Sandbox.Game.Entities
                 objBuilder.Name = this.Name;
                 objBuilder.PersistentFlags = Render.PersistentFlags;
 
-                if (MyPerGameSettings.ComponentSaving)
-                    objBuilder.ComponentContainer = Components.Serialize();
+                objBuilder.ComponentContainer = Components.Serialize();
             }
             return objBuilder;
         }

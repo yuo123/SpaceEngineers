@@ -86,6 +86,7 @@ namespace Sandbox
         public static bool IsUpdateReady = true;
 
         public static bool IsConsoleVisible = false;
+        public static bool IsReloading = false;
 
         public static bool FatalErrorDuringInit = false;
         public static VRageGameServices Services { get; private set; }
@@ -211,7 +212,12 @@ namespace Sandbox
 
                 MyLog.Default.WriteLineAndConsole("Bind IP : " + ep.ToString());
 
-                MyDedicatedServer dedicatedServer = new MyDedicatedServer(ep);
+                MyDedicatedServerBase dedicatedServer = null;
+                if (MyFakes.ENABLE_BATTLE_SYSTEM && MySandboxGame.ConfigDedicated.SessionSettings.Battle)
+                    dedicatedServer = new MyDedicatedServerBattle(ep);
+                else 
+                    dedicatedServer = new MyDedicatedServer(ep);
+
                 MyMultiplayer.Static = dedicatedServer;
 
                 FatalErrorDuringInit = !dedicatedServer.ServerStarted;
@@ -227,7 +233,7 @@ namespace Sandbox
             // Game tags contain game data hash, so they need to be sent after preallocation
             if (IsDedicated && !FatalErrorDuringInit)
             {
-                (MyMultiplayer.Static as MyDedicatedServer).SendGameTagsToSteam();
+                (MyMultiplayer.Static as MyDedicatedServerBase).SendGameTagsToSteam();
             }
 
             ProfilerShort.BeginNextBlock("InitMultithreading");
@@ -645,7 +651,11 @@ namespace Sandbox
                             {
                                 if (MySteamWorkshop.DownloadWorldModsBlocking(checkpoint.Mods))
                                 {
-                                    MySession.Load(sessionPath, checkpoint, checkpointSizeInBytes);
+                                    if (MyFakes.ENABLE_BATTLE_SYSTEM && ConfigDedicated.SessionSettings.Battle)
+                                        MySession.LoadBattle(sessionPath, checkpoint, checkpointSizeInBytes, ConfigDedicated.SessionSettings);
+                                    else
+                                        MySession.Load(sessionPath, checkpoint, checkpointSizeInBytes);
+
                                     MySession.Static.StartServer(MyMultiplayer.Static);
                                     MyModAPIHelper.OnSessionLoaded();
                                 }
@@ -1194,7 +1204,7 @@ namespace Sandbox
 
             UnloadInput();
 
-            MyAudio.Static.UnloadData();
+            MyAudio.UnloadData();
 
             MySandboxGame.Log.DecreaseIndent();
             MySandboxGame.Log.WriteLine("MySandboxGame.UnloadData() - END");
@@ -1214,8 +1224,9 @@ namespace Sandbox
         void UnloadInput()
         {
             // Input
-            if (MyInput.Static != null)
-                MyInput.Static.UnloadData();
+            MyInput.UnloadData();
+
+            MyGuiGameControlsHelpers.Reset();
         }
 
         #endregion
@@ -1744,6 +1755,11 @@ namespace Sandbox
 
             Parallel.Scheduler.WaitForTasksToFinish(TimeSpan.FromSeconds(10));
             m_windowCreatedEvent.Dispose();
+
+
+            IlChecker.Clear();
+
+            Services = null;
         }
 
         internal static void SignalClipmapsReady()
@@ -1781,6 +1797,17 @@ namespace Sandbox
         {
             IntPtr gameState = new IntPtr(MySession.Static == null ? 0 : 1);
             WinApi.PostMessage(msg.WParam, MyWMCodes.GAME_IS_RUNNING_RESULT, gameState, IntPtr.Zero);
+        }
+
+        public static void ReloadDedicatedServerSession()
+        {
+            if (!IsDedicated)
+                return;
+
+            MyLog.Default.WriteLineAndConsole("Reloading dedicated server");
+
+            IsReloading = true;
+            MySandboxGame.Static.Exit();
         }
     }
 }

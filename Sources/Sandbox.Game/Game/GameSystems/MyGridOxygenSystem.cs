@@ -421,7 +421,8 @@ namespace Sandbox.Game.GameSystems
                 foreach (var deletedBlock in m_deletedBlocks)
                 {
                     RemoveBlock(deletedBlock);
-        }
+                }
+                ApplyDepressurizationForces();
                 m_deletedBlocks.Clear();
                 ProfilerShort.End();
             }
@@ -966,7 +967,7 @@ namespace Sandbox.Game.GameSystems
                     for (int i = 0; i < m_prevCubeRoom.GetLength(0); i++)
                         for (int j = 0; j < m_prevCubeRoom.GetLength(1); j++)
                             for (int k = 0; k < m_prevCubeRoom.GetLength(2); k++)
-                                {
+                            {
                                 Vector3I pos = new Vector3I(i, j, k) + m_prevMin - GridMin();
                                 if (!IsInGridBounds(pos, m_cubeRoom))
                                     continue;
@@ -976,15 +977,15 @@ namespace Sandbox.Game.GameSystems
                                 bool breachDetected = false;
 
                                 //Do a preliminary scan to check if there is any new breach
-                                    for (int l = 0; l < 6; l++)
-                                    {
+                                for (int l = 0; l < 6; l++)
+                                {
                                     Vector3I currNeighbourPos = pos + m_neighbours[l];
                                     if (!IsInGridBounds(currNeighbourPos, m_cubeRoom))
                                         continue;
 
                                     Vector3I prevNeighbourPos = new Vector3I(i, j, k) + m_neighbours[l];
                                     if (!IsInGridBounds(prevNeighbourPos, m_prevCubeRoom))
-                                            continue;
+                                        continue;
 
                                     var currNeighbourRoom = m_cubeRoom[currNeighbourPos.X, currNeighbourPos.Y, currNeighbourPos.Z].Room;
                                     var prevNeighbourRoom = m_prevCubeRoom[prevNeighbourPos.X, prevNeighbourPos.Y, prevNeighbourPos.Z].Room;
@@ -1045,9 +1046,9 @@ namespace Sandbox.Game.GameSystems
                 ApplyDepressurizationForces();
 
                 foreach (var room in m_rooms)
-                                        {
+                {
                     if (room.OxygenLevel(m_cubeGrid.GridSize) > 1.0)
-                                            {
+                    {
                         room.OxygenAmount = room.MaxOxygen(m_cubeGrid.GridSize);
                     }
 
@@ -1058,104 +1059,104 @@ namespace Sandbox.Game.GameSystems
             isPressurizing = false;
             m_queueIndex = 0;
         }
-                                                
+
         private void AddDepressurizationEffects(Vector3D from, Vector3D to)
         {
-                                                //Force
-                                                float MAX_DISTANCE = 5f;
+            //Force
+            float MAX_DISTANCE = 5f;
 
-                                                var boundingSphere = new BoundingSphereD(to, MAX_DISTANCE);
-                                                var decompressionDirection = Vector3D.Normalize(to - from);
-                                                MyGamePruningStructure.GetAllEntitiesInSphere<MyEntity>(ref boundingSphere, m_entitiesInDepressurizationRange);
+            var boundingSphere = new BoundingSphereD(to, MAX_DISTANCE);
+            var decompressionDirection = Vector3D.Normalize(to - from);
+            MyGamePruningStructure.GetAllEntitiesInSphere<MyEntity>(ref boundingSphere, m_entitiesInDepressurizationRange);
 
-                                                foreach (var entity in m_entitiesInDepressurizationRange)
-                                                {
-                                                    if (!(entity is MyCubeBlock) && !(entity is MyEntitySubpart) && entity.Physics != null)
-                                                    {
-                                                        var entityPos = entity.PositionComp.WorldMatrix.Translation;
-                                                        
-                                                        var forceDirection = (to - from) / 2f;
-                                                        var distance = (to - entityPos).Length();
-                                                        if (distance < MAX_DISTANCE)
-                                                        {
-                                                            forceDirection /= distance;
+            foreach (var entity in m_entitiesInDepressurizationRange)
+            {
+                if (!(entity is MyCubeBlock) && !(entity is MyEntitySubpart) && entity.Physics != null)
+                {
+                    var entityPos = entity.PositionComp.WorldMatrix.Translation;
 
-                                                            if (Vector3D.Dot(decompressionDirection, forceDirection) < 0f)
-                                                            {
-                                                                forceDirection = -forceDirection;
-                                                            }
+                    var forceDirection = (to - from) / 2f;
+                    var distance = (to - entityPos).Length();
+                    if (distance < MAX_DISTANCE)
+                    {
+                        forceDirection /= distance;
+
+                        if (Vector3D.Dot(decompressionDirection, forceDirection) < 0f)
+                        {
+                            forceDirection = -forceDirection;
+                        }
 
                         //float forceStrength = 500f * prevRoom.Room.OxygenLevel(m_cubeGrid.GridSize) * (1f - (float)distance / MAX_DISTANCE);
                         float forceStrength = 500f * (1f - (float)distance / MAX_DISTANCE);
 
-                                                            MyDepressurizationForceInfo forceInfo;
-                                                            if (!m_forcesToApply.TryGetValue(entity, out forceInfo))
-                                                            {
-                                                                forceInfo = new MyDepressurizationForceInfo();
+                        MyDepressurizationForceInfo forceInfo;
+                        if (!m_forcesToApply.TryGetValue(entity, out forceInfo))
+                        {
+                            forceInfo = new MyDepressurizationForceInfo();
 
-                                                                forceInfo.Direction = forceDirection;
-                                                                forceInfo.Strength = forceStrength;
-                                                                forceInfo.ForceCount = 1;
-                                                            }
-                                                            else
-                                                            {
-                                                                forceInfo.Direction = (forceInfo.Direction * forceInfo.ForceCount + forceDirection) / (forceInfo.ForceCount + 1);
-                                                                forceInfo.Strength = (forceInfo.Strength * forceInfo.ForceCount + forceStrength) / (forceInfo.ForceCount + 1);
-                                                                forceInfo.ForceCount++;
-                                                            }
+                            forceInfo.Direction = forceDirection;
+                            forceInfo.Strength = forceStrength;
+                            forceInfo.ForceCount = 1;
+                        }
+                        else
+                        {
+                            forceInfo.Direction = (forceInfo.Direction * forceInfo.ForceCount + forceDirection) / (forceInfo.ForceCount + 1);
+                            forceInfo.Strength = (forceInfo.Strength * forceInfo.ForceCount + forceStrength) / (forceInfo.ForceCount + 1);
+                            forceInfo.ForceCount++;
+                        }
 
-                                                            m_forcesToApply[entity] = forceInfo;
-                                                        }
-                                                    }
-                                                }
+                        m_forcesToApply[entity] = forceInfo;
+                    }
+                }
+            }
 
-                                                m_entitiesInDepressurizationRange.Clear();
+            m_entitiesInDepressurizationRange.Clear();
 
-                                                //Effect
-                                                MyParticleEffect m_effect;
-                                                if (MyParticlesManager.TryCreateParticleEffect(49, out m_effect))
-                                                {
-                                                    var orientation = Matrix.CreateFromDir(to - from);
-                                                    orientation.Translation = from;
-                                                    m_effect.UserScale = 3f;
-                                                    
-                                                    m_effect.WorldMatrix = orientation;
-                                                    m_effect.AutoDelete = true;
+            //Effect
+            MyParticleEffect m_effect;
+            if (MyParticlesManager.TryCreateParticleEffect(49, out m_effect))
+            {
+                var orientation = Matrix.CreateFromDir(to - from);
+                orientation.Translation = from;
+                m_effect.UserScale = 3f;
 
-                                                    m_depressurizationEffects.Add(m_effect);
-                                                }
-                                            }
+                m_effect.WorldMatrix = orientation;
+                m_effect.AutoDelete = true;
+
+                m_depressurizationEffects.Add(m_effect);
+            }
+        }
 
         private void ApplyDepressurizationForces()
         {
-                foreach (var force in m_forcesToApply)
+            foreach (var force in m_forcesToApply)
+            {
+                var entity = force.Key;
+                var forceInfo = force.Value;
+
+                var character = entity as Sandbox.Game.Entities.Character.MyCharacter;
+                if (character != null)
                 {
-                    var entity = force.Key;
-                    var forceInfo = force.Value;
-
-                    var character = entity as Sandbox.Game.Entities.Character.MyCharacter;
-                    if (character != null)
+                    if (character.Parent != null)
                     {
-                        if (character.Parent != null)
-                        {
-                            continue;
-                        }
-                        forceInfo.Strength *= 5f;
+                        continue;
                     }
-
-                    if (forceInfo.Strength > 1f)
-                    {
-                        if (character != null && character.IsDead == false)
-                        {
-                            character.EnableJetpack(true);
-                        }
-
-                        forceInfo.Direction.Normalize();
-                        entity.Physics.AddForce(MyPhysicsForceType.APPLY_WORLD_IMPULSE_AND_WORLD_ANGULAR_IMPULSE, forceInfo.Direction * forceInfo.Strength, entity.PositionComp.WorldMatrix.Translation, null);
-                    }
+                    forceInfo.Strength *= 5f;
                 }
 
-                m_forcesToApply.Clear();
+                if (forceInfo.Strength > 1f)
+                {
+                    if (character != null && character.IsDead == false)
+                    {
+                        character.EnableJetpack(true);
+                    }
+
+                    forceInfo.Direction.Normalize();
+                    entity.Physics.AddForce(MyPhysicsForceType.APPLY_WORLD_IMPULSE_AND_WORLD_ANGULAR_IMPULSE, forceInfo.Direction * forceInfo.Strength, entity.PositionComp.WorldMatrix.Translation, null);
+                }
+            }
+
+            m_forcesToApply.Clear();
         }
 
         private double GridCubeVolume()
@@ -1193,7 +1194,7 @@ namespace Sandbox.Game.GameSystems
             if (pos.Y < 0 || pos.Y >= grid.GetLength(1))
                 return false;
             if (pos.Z < 0 || pos.Z >= grid.GetLength(2))
-            return false;
+                return false;
 
             return true;
         }

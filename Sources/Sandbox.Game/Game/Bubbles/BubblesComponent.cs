@@ -19,7 +19,11 @@ namespace Sandbox.Game.Bubbles
             for (int i = 0; i < count; i++)
             {
                 if (i < MyPhysics.Bubbles.Count && MyPhysics.Bubbles[i] != null)
+                {
                     MyPhysics.Bubbles[i].UpdateAfterSimulation();
+                    //MTODO: implement a frame counter to call this method at the appropriate intervals
+                    MyPhysics.Bubbles[i].UpdateAfterSimulation100();
+                }
             }
         }
 

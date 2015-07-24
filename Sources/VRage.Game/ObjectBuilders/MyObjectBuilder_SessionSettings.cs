@@ -198,7 +198,7 @@ namespace Sandbox.Common.ObjectBuilders
         [GameRelationAttribute(Game.SpaceEngineers)]
         public int ViewDistance = 20000;
 
-        [ProtoMember]
+		[ProtoMember]
 		[Display(Name = "Flora density")]
 		[GameRelationAttribute(Game.SpaceEngineers)]
 		public int FloraDensity = 20;
@@ -230,10 +230,10 @@ namespace Sandbox.Common.ObjectBuilders
         [GameRelationAttribute(Game.SpaceEngineers)]
         public bool EnableEncounters = true;
 
-        [ProtoMember]
+		[ProtoMember]
 		[Display(Name = "Enable flora")]
 		[GameRelationAttribute(Game.SpaceEngineers)]
-		public bool EnableFlora = true;
+        public bool EnableFlora = false;
 
 		[ProtoMember]
 		[Display(Name = "Enable Station Voxel Support")]
@@ -294,6 +294,26 @@ namespace Sandbox.Common.ObjectBuilders
         [Display(Name = "Spawn with tools")]
         [GameRelationAttribute(Game.SpaceEngineers)]
         public bool SpawnWithTools = true;
+
+        [ProtoMember]
+        [Display(Name = "Planet min size")]
+        [GameRelationAttribute(Game.SpaceEngineers)]
+        public float PlanetMinSize = 30 * 1000;
+
+        [ProtoMember]
+        [Display(Name = "Planet max size")]
+        [GameRelationAttribute(Game.SpaceEngineers)]
+        public float PlanetMaxSize = 50 * 1000;
+
+        [ProtoMember]
+        [Display(Name = "Moon min size")]
+        [GameRelationAttribute(Game.SpaceEngineers)]
+        public float MoonMinSize = 8 * 1000;
+
+        [ProtoMember]
+        [Display(Name = "Moon max size")]
+        [GameRelationAttribute(Game.SpaceEngineers)]
+        public float MoonMaxSize = 10 * 1000;
 
         public void LogMembers(MyLog log, LoggingOptions options)
         {
